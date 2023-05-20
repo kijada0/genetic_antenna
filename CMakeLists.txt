@@ -3,4 +3,4 @@ project(genetic_antenna C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(genetic_antenna main.c plot_test.cpp)
+add_executable(genetic_antenna main.c)

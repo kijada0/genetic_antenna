@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.20)
 project(genetic_antenna)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -25,6 +25,12 @@ set(NECPP_SRC
 
 # ADD EXECUTABLE
 add_executable(genetic_antenna ${CPP_SRC} ${NECPP_SRC})
+
+add_library(lapack SHARED IMPORTED)
+set_target_properties(lapack PROPERTIES
+        IMPORTED_LOCATION "D:/Privo/genetic_antenna/cpp_src/liblapack.dll"
+        IMPORTED_IMPLIB "D:/Privo/genetic_antenna/cpp_src/liblapack.lib"
+    )
 
 target_include_directories(genetic_antenna PRIVATE D:/Documents/Library/necpp/src)
 target_compile_options(genetic_antenna PRIVATE -O2 -Wall)

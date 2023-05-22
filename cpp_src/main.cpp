@@ -59,5 +59,8 @@ int main(int argc, char **argv) {
     catch (nec_exception* e) {
         cout << e->get_message() << endl;
     }
+
+    int a;
+    cin >> a;
     return 0;
 }

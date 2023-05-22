@@ -7,20 +7,20 @@ set(CPP_SRC main.cpp)
 
 # LINKING NECPP
 set(NECPP_SRC
-        "D:/Documents/Library/necpp/src/c_ggrid.cpp"
-        "D:/Documents/Library/necpp/src/matrix_algebra.cpp"
-        "D:/Documents/Library/necpp/src/nec_ground.cpp"
-        "D:/Documents/Library/necpp/src/c_evlcom.cpp"
-        "D:/Documents/Library/necpp/src/c_plot_card.cpp"
-        "D:/Documents/Library/necpp/src/misc.cpp"
-        "D:/Documents/Library/necpp/src/nec_context.cpp"
-        "D:/Documents/Library/necpp/src/nec_output.cpp"
-        "D:/Documents/Library/necpp/src/c_geometry.cpp"
-        "D:/Documents/Library/necpp/src/nec_exception.cpp"
-        "D:/Documents/Library/necpp/src/nec_radiation_pattern.cpp"
-        "D:/Documents/Library/necpp/src/nec_structure_currents.cpp"
-        "D:/Documents/Library/necpp/src/electromag.cpp"
-        "D:/Documents/Library/necpp/src/nec_results.cpp"
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/c_ggrid.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/matrix_algebra.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/nec_ground.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/c_evlcom.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/c_plot_card.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/misc.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/nec_context.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/nec_output.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/c_geometry.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/nec_exception.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/nec_radiation_pattern.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/nec_structure_currents.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/electromag.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/nec_results.cpp
         )
 
 # ADD EXECUTABLE
@@ -28,8 +28,8 @@ add_executable(genetic_antenna ${CPP_SRC} ${NECPP_SRC})
 
 add_library(lapack SHARED IMPORTED)
 set_target_properties(lapack PROPERTIES
-        IMPORTED_LOCATION "D:/Privo/genetic_antenna/cpp_src/liblapack.dll"
-        IMPORTED_IMPLIB "D:/Privo/genetic_antenna/cpp_src/liblapack.lib"
+        IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/lib/lapack/liblapack.dll
+        IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/lapack/liblapack.lib
     )
 
 target_include_directories(genetic_antenna PRIVATE D:/Documents/Library/necpp/src)

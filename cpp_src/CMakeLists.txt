@@ -1,9 +1,15 @@
 cmake_minimum_required(VERSION 3.20)
 project(genetic_antenna)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 
-set(CPP_SRC main.cpp)
+set(CPP_SRC
+        main.cpp
+        main.h
+        wire_geometry.cpp
+        wire_geometry.h
+        physical_calculations.cpp
+        physical_calculations.h)
 
 # LINKING NECPP
 set(NECPP_SRC

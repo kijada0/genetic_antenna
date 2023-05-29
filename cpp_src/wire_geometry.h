@@ -32,6 +32,8 @@ struct antenna_geometry_t{
 
 // -------------------------------------------------------------------------------- //
 
+void print_antenna_geometry(antenna_geometry_t *geometry);
+bool check_if_geometry_fits_in_cube(antenna_geometry_t *geometry, double cube_edge_length);
 antenna_geometry_t generate_random_antenna();
 void save_geometry_to_file(antenna_geometry_t *geometry, const char *file_name);
 

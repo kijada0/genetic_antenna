@@ -9,7 +9,12 @@ set(CPP_SRC
         wire_geometry.cpp
         wire_geometry.h
         physical_calculations.cpp
-        physical_calculations.h)
+        physical_calculations.h
+        fitness_functions.cpp
+        fitness_functions.h
+        mutation_functions.cpp
+        mutation_functions.h
+    )
 
 # LINKING NECPP
 set(NECPP_SRC

@@ -69,6 +69,7 @@ void calculate_wire_vectors(antenna_geometry_t *geometry){
             geometry->wires[i+1].start.y = geometry->wires[i].end.y;
             geometry->wires[i+1].start.z = geometry->wires[i].end.z;
         }
+
     }
 }
 
@@ -101,7 +102,7 @@ bool check_if_geometry_fits_in_cube(antenna_geometry_t *geometry, double cube_ed
 void divide_length_into_random_length_segment(double length, int element, double *target){
     rand();
     double length_sum = 0.0;
-    double offset = 0.25;
+    double offset = 0.75;
     double min_length = (length/element) * (1 - offset);
     double max_length = (length/element) * (1 + offset);
 
@@ -136,6 +137,17 @@ void generate_random_antenna_wires(antenna_geometry_t *geometry){
     }
 }
 
+void generate_test_dipol(antenna_geometry_t *geometry){
+    double wavelength = calculate_wavelength(FREQ)*0.95;
+    double segments_lengths = (wavelength/2)/WIRE_COUNT;
+
+    for(int i = 0; i < WIRE_COUNT; i++){
+        geometry->geometry[i].length = segments_lengths;
+        geometry->geometry[i].angle_xy = 0;
+        geometry->geometry[i].angle_xz = M_PI/2;
+    }
+}
+
 // -------------------------------------------------------------------------------- //
 
 
@@ -143,7 +155,8 @@ antenna_geometry_t generate_random_antenna(){
     antenna_geometry_t random_antenna{};
 
     init_antenna_geometry(&random_antenna);
-    generate_random_antenna_wires(&random_antenna);
+    generate_test_dipol(&random_antenna);
+    //generate_random_antenna_wires(&random_antenna);
     calculate_wire_vectors(&random_antenna);
     print_antenna_wires(&random_antenna);
 
@@ -153,7 +166,7 @@ antenna_geometry_t generate_random_antenna(){
 // -------------------------------------------------------------------------------- //
 
 void save_geometry_to_file(antenna_geometry_t *geometry, const char *file_name){
-    cout << "Saving geometry to file: " << file_name << endl;
+    cout << "Saving geometry to file: " << file_name << "\n" << endl;
 
     ofstream file;
     file.open(file_name);
@@ -164,3 +177,11 @@ void save_geometry_to_file(antenna_geometry_t *geometry, const char *file_name){
     }
 
 }
+
+// -------------------------------------------------------------------------------- //
+
+double calculate_wire_length(wire_vector_t *wire){
+    return sqrt(pow(wire->end.x - wire->start.x, 2) + pow(wire->end.y - wire->start.y, 2) + pow(wire->end.z - wire->start.z, 2));
+}
+
+// -------------------------------------------------------------------------------- //

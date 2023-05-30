@@ -46,6 +46,7 @@ def show_geometry(geometry):
 
     time = datetime.now().strftime("%Y%m%d_%H%M%S")
 
+    plt.show();
     plt.savefig("out/geometry" + str(time) + ".png")
 
 

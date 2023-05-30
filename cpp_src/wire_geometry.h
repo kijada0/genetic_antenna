@@ -1,3 +1,8 @@
+// ---------------------------------------- //
+// created by: Kacper Kaczmarek
+// created date: 28-05-2023
+// ---------------------------------------- //
+
 #ifndef GENETIC_ANTENNA_WIRE_GEOMETRY_H
 #define GENETIC_ANTENNA_WIRE_GEOMETRY_H
 
@@ -32,10 +37,14 @@ struct antenna_geometry_t{
 
 // -------------------------------------------------------------------------------- //
 
-void print_antenna_geometry(antenna_geometry_t *geometry);
 bool check_if_geometry_fits_in_cube(antenna_geometry_t *geometry, double cube_edge_length);
 antenna_geometry_t generate_random_antenna();
 void save_geometry_to_file(antenna_geometry_t *geometry, const char *file_name);
+void print_antenna_geometry(antenna_geometry_t *geometry);
+
+// -------------------------------------------------------------------------------- //
+
+double calculate_wire_length(wire_vector_t *wire);
 
 
 #endif //GENETIC_ANTENNA_WIRE_GEOMETRY_H

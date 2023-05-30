@@ -15,6 +15,7 @@
 
 #include "physical_calculations.h"
 #include "wire_geometry.h"
+#include "fitness_functions.h"
 
 using namespace std;
 
@@ -26,7 +27,11 @@ int main() {
     cout << "Genetic Antenna generator start!" << endl;
 
     antenna_geometry_t antenna = generate_random_antenna();
+
     save_geometry_to_file(&antenna, "geometry_test.txt");
+
+    antenna_parameters_t parameters = calculate_antenna_parameters(&antenna, FREQ);
+    print_antenna_parameters(&parameters);
 
     return 0;
 }

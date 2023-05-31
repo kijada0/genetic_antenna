@@ -139,7 +139,7 @@ void generate_random_antenna_wires(antenna_geometry_t *geometry){
 
 void generate_test_dipol(antenna_geometry_t *geometry){
     double wavelength = calculate_wavelength(FREQ)*0.95;
-    double segments_lengths = (wavelength/2)/WIRE_COUNT;
+    double segments_lengths = (wavelength/4)/WIRE_COUNT;
 
     for(int i = 0; i < WIRE_COUNT; i++){
         geometry->geometry[i].length = segments_lengths;

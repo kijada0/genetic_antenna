@@ -24,10 +24,10 @@ using namespace std;
 void print_antenna_parameters(antenna_parameters_t *parameters){
     cout << "Antenna parameters:" << endl;
     cout << "----------------------------------------" << endl;
-    cout << "Gain:       \t" << parameters->gain << " dBi" << endl;
-    cout << "Efficiency: \t" << parameters->efficiency << " %" << endl;
-    cout << "Bandwidth:  \t" << parameters->bandwidth << " MHz" << endl;
-    cout << "Impedance:  \t" << parameters->impedance << " Ohm" << endl;
+    cout << "Gain mean:  \t" << parameters->gain.mean << " dBi" << endl;
+    cout << "Gain max:   \t" << parameters->gain.max << " dBi" << endl;
+    cout << "Gain min:   \t" << parameters->gain.min << " dBi" << endl;
+    cout << "Impedance:  \t" << parameters->impedance.Z << " Ohm ( " << parameters->impedance.real << " + " << parameters->impedance.imag << "j )" << endl;
     cout << "SWR:        \t" << parameters->SWR << endl;
     cout << "----------------------------------------" << endl;
 }
@@ -47,9 +47,9 @@ void create_and_fill_nec_geometry(nec_context *nec, wire_vector_t *wires, double
 
 void setup_nec_cards(nec_context *nec, double frequency){
     nec->gn_card(-1 ,0, 0, 0, 0, 0, 0, 0);
-    nec->ex_card(EXCITATION_LINEAR, 1, 1, 0, 0, 0, 0, 0, 0, 0);
-    nec->fr_card(0, 1, FREQ, 0);
-    nec->rp_card(0, 18, 18, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0);
+    nec->ex_card(EXCITATION_VOLTAGE, 0, 1, 0, 1, 0, 0, 0, 0, 0);
+    nec->fr_card(0, 1, FREQ/1000000, 0);
+    nec->rp_card(0, 90,90, 0, 5, 0, 0, 0, 90, 1, 1, 0, 0);
     //nec->xq_card(0);
 }
 
@@ -57,20 +57,32 @@ void setup_nec_cards(nec_context *nec, double frequency){
 
 antenna_parameters_t calculate_antenna_parameters(antenna_geometry_t *geometry, double frequency){
     antenna_parameters_t parameters;
+    try {
 
-    nec_context nec;
-    nec.initialize();
+        nec_context nec;
+        nec.initialize();
 
-    create_and_fill_nec_geometry(&nec, geometry->wires, frequency);
-    setup_nec_cards(&nec, frequency);
+        create_and_fill_nec_geometry(&nec, geometry->wires, frequency);
+        setup_nec_cards(&nec, frequency);
 
-    nec_radiation_pattern* rp = nec.get_radiation_pattern(0);
+        //nec_radiation_pattern *rp = nec.get_radiation_pattern(0);
 
-    parameters.gain = nec.get_gain_mean(0);
-    parameters.efficiency = 0;
-    parameters.bandwidth = 0;
-    parameters.impedance = 0;
-    parameters.SWR = 0;
+        parameters.gain.mean = nec.get_gain_mean(0);
+        parameters.gain.max = nec.get_gain_max(0);
+        parameters.gain.min = nec.get_gain_min(0);
+
+        parameters.impedance.imag = nec.get_impedance_imag(0);
+        parameters.impedance.real = nec.get_impedance_real(0);
+        parameters.impedance.Z = sqrt(pow(parameters.impedance.imag, 2) + pow(parameters.impedance.real, 2));
+
+        parameters.efficiency = 0;
+        parameters.bandwidth = 0;
+        parameters.SWR = 0;
+
+    }
+    catch (nec_exception* e) {
+        cout << e->get_message() << endl;
+    }
 
     return parameters;
 }

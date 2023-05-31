@@ -6,7 +6,7 @@
 #ifndef GENETIC_ANTENNA_FITNESS_FUNCTIONS_H
 #define GENETIC_ANTENNA_FITNESS_FUNCTIONS_H
 
-#define WIRE_RADIUS 0.003           // 3mm in meters
+#define WIRE_RADIUS 0.005           // 3mm in meters
 #define WIRE_PER_WAVELENGTH 16      // should be around 12-20
 
 #define FREQ_STEP 100000            // 100kHz
@@ -18,11 +18,23 @@
 
 // -------------------------------------------------------------------------------- //
 
+struct antenna_gain_t{
+    double max;
+    double min;
+    double mean;
+};
+
+struct antenna_impedance_t{
+    double real;
+    double imag;
+    double Z;
+};
+
 struct antenna_parameters_t{
-    double gain;
+    antenna_gain_t gain;
     double efficiency;
     double bandwidth;
-    double impedance;
+    antenna_impedance_t impedance;
     double SWR;
 };
 

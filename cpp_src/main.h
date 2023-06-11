@@ -6,12 +6,26 @@
 #ifndef GENETIC_ANTENNA_MAIN_H
 #define GENETIC_ANTENNA_MAIN_H
 
-#define WIRE_COUNT 1
+// ---------------------------------------- //
+// Antenna parameters //
+#define WIRE_COUNT 4
+#define GROUND_PLANE_ELEMENT_COUNT 4
+#define TOTAL_WIRE_COUNT (WIRE_COUNT+GROUND_PLANE_ELEMENT_COUNT)
 #define CUBE_EDGE_LENGTH_RELATIVE_TO_WAVELENGTH 0.5
 
-#define FREQ 433000000
+// ---------------------------------------- //
+// Target parameters //
+#define FREQ 144000000
 
-#define POPULATION_SIZE 256
+// ---------------------------------------- //
+// Population parameters //
+#define POPULATION_SIZE 1
+#define PARENT_COUNT 128
 #define MUTATION_RATE 0.08
+
+
+// ---------------------------------------- //
+// System parameters //
+#define MAX_THREAD_COUNT 24
 
 #endif //GENETIC_ANTENNA_MAIN_H

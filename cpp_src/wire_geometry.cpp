@@ -7,9 +7,10 @@
 #include <cstdlib>
 #include <math.h>
 #include <fstream>
+#include <cstring>
 
 #include "wire_geometry.h"
-#include "physical_calculations.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -17,79 +18,94 @@ using namespace std;
 
 void init_antenna_geometry(antenna_geometry_t *geometry){
     for(int i = 0; i < WIRE_COUNT; i++){
-        geometry->wires[i].start.x = 0.0;
-        geometry->wires[i].start.y = 0.0;
-        geometry->wires[i].start.z = 0.0;
+        geometry->geometry[i].start.x = 0.0;
+        geometry->geometry[i].start.y = 0.0;
+        geometry->geometry[i].start.z = 0.0;
 
-        geometry->wires[i].end.x = 0.0;
-        geometry->wires[i].end.y = 0.0;
-        geometry->wires[i].end.z = 0.0;
+        geometry->geometry[i].end.x = 0.0;
+        geometry->geometry[i].end.y = 0.0;
+        geometry->geometry[i].end.z = 0.0;
 
-        geometry->geometry[i].length = 0.0;
-        geometry->geometry[i].angle_xy = 0.0;
-        geometry->geometry[i].angle_xz = 0.0;
+        geometry->active_elements[i].length = 0.0;
+        geometry->active_elements[i].angle_xy = 0.0;
+        geometry->active_elements[i].angle_xz = 0.0;
     }
 }
 
 // -------------------------------------------------------------------------------- //
 
 void print_antenna_geometry(antenna_geometry_t *geometry){
-    cout << "\nAntenna geometry: " << endl;
+    cout << "\nAntenna active_elements: " << endl;
     for(int i = 0; i < WIRE_COUNT; i++){
         cout << "----------------------------------------" << endl;
-        cout << "Wire " << i+1 << " start: " << geometry->wires[i].start.x << " " << geometry->wires[i].start.y << " " << geometry->wires[i].start.z << endl;
-        cout << "Wire " << i+1 << " end: " << geometry->wires[i].end.x << " " << geometry->wires[i].end.y << " " << geometry->wires[i].end.z << endl;
-        cout << "Wire " << i+1 << " length: " << geometry->geometry[i].length << endl;
-        cout << "Wire " << i+1 << " angle_xy: " << geometry->geometry[i].angle_xy << endl;
-        cout << "Wire " << i+1 << " angle_xz: " << geometry->geometry[i].angle_xz << endl;
+        cout << "Wire " << i+1 << " start: " << geometry->geometry[i].start.x << " " << geometry->geometry[i].start.y << " " << geometry->geometry[i].start.z << endl;
+        cout << "Wire " << i+1 << " end: " << geometry->geometry[i].end.x << " " << geometry->geometry[i].end.y << " " << geometry->geometry[i].end.z << endl;
+        cout << "Wire " << i+1 << " length: " << geometry->active_elements[i].length << endl;
+        cout << "Wire " << i+1 << " angle_xy: " << geometry->active_elements[i].angle_xy << endl;
+        cout << "Wire " << i+1 << " angle_xz: " << geometry->active_elements[i].angle_xz << endl;
     }
     cout << "----------------------------------------\n" << endl;
 }
 
 void print_antenna_wires(antenna_geometry_t *geometry){
-    cout << "\nAntenna wires: " << endl;
+    cout << "\nAntenna geometry: " << endl;
     cout << "----------------------------------------" << endl;
-    for(int i = 0; i < WIRE_COUNT; i++){
-        printf("wire %d \t->  start -> x: %.3f y: %.3f  z: %.3f \t", i+1, geometry->wires[i].start.x, geometry->wires[i].start.y, geometry->wires[i].start.z);
-        printf("end -> x: %.3f  y: %.3f  z: %.3f\n", geometry->wires[i].end.x, geometry->wires[i].end.y, geometry->wires[i].end.z);
+    for(int i = 0; i < TOTAL_WIRE_COUNT; i++){
+        printf("wire %d \t->  start -> x: %.3f y: %.3f  z: %.3f \t", i+1, geometry->geometry[i].start.x, geometry->geometry[i].start.y, geometry->geometry[i].start.z);
+        printf("end -> x: %.3f  y: %.3f  z: %.3f\n", geometry->geometry[i].end.x, geometry->geometry[i].end.y, geometry->geometry[i].end.z);
     }
     cout << "----------------------------------------\n" << endl;
 }
 
 // -------------------------------------------------------------------------------- //
 
-void calculate_wire_vectors(antenna_geometry_t *geometry){
+void calculate_wire_geometry_of_active_elements(antenna_geometry_t *geometry){
     for(int i = 0; i < WIRE_COUNT; i++){
-        geometry->wires[i].end.x = geometry->wires[i].start.x + geometry->geometry[i].length * cos(geometry->geometry[i].angle_xy) * cos(geometry->geometry[i].angle_xz);
-        geometry->wires[i].end.y = geometry->wires[i].start.y + geometry->geometry[i].length * sin(geometry->geometry[i].angle_xy) * cos(geometry->geometry[i].angle_xz);
-        geometry->wires[i].end.z = geometry->wires[i].start.z + geometry->geometry[i].length * sin(geometry->geometry[i].angle_xz);
+        geometry->geometry[i].end.x = geometry->geometry[i].start.x + geometry->active_elements[i].length * cos(geometry->active_elements[i].angle_xy) * cos(geometry->active_elements[i].angle_xz);
+        geometry->geometry[i].end.y = geometry->geometry[i].start.y + geometry->active_elements[i].length * sin(geometry->active_elements[i].angle_xy) * cos(geometry->active_elements[i].angle_xz);
+        geometry->geometry[i].end.z = geometry->geometry[i].start.z + geometry->active_elements[i].length * sin(geometry->active_elements[i].angle_xz);
 
         if(i < WIRE_COUNT-1){
-            geometry->wires[i+1].start.x = geometry->wires[i].end.x;
-            geometry->wires[i+1].start.y = geometry->wires[i].end.y;
-            geometry->wires[i+1].start.z = geometry->wires[i].end.z;
+            geometry->geometry[i + 1].start.x = geometry->geometry[i].end.x;
+            geometry->geometry[i + 1].start.y = geometry->geometry[i].end.y;
+            geometry->geometry[i + 1].start.z = geometry->geometry[i].end.z;
         }
-
     }
 }
 
+void calculate_wire_geometry_of_ground_plane(antenna_geometry_t *geometry){
+    for(int i = 0; i < GROUND_PLANE_ELEMENT_COUNT; i++){
+        geometry->geometry[i + WIRE_COUNT].start.x = 0;
+        geometry->geometry[i + WIRE_COUNT].start.y = 0;
+        geometry->geometry[i + WIRE_COUNT].start.z = 0;
+
+        geometry->geometry[i + WIRE_COUNT].end.x = geometry->ground_plane[i].length * cos(geometry->ground_plane[i].angle_xy) * cos(geometry->ground_plane[i].angle_xz);
+        geometry->geometry[i + WIRE_COUNT].end.y = geometry->ground_plane[i].length * sin(geometry->ground_plane[i].angle_xy) * cos(geometry->ground_plane[i].angle_xz);
+        geometry->geometry[i + WIRE_COUNT].end.z = geometry->ground_plane[i].length * sin(geometry->ground_plane[i].angle_xz);
+    }
+}
+
+void calculate_wire_geometry(antenna_geometry_t *geometry){
+    calculate_wire_geometry_of_active_elements(geometry);
+    calculate_wire_geometry_of_ground_plane(geometry);
+}
 
 // -------------------------------------------------------------------------------- //
 
 bool check_if_geometry_fits_in_cube(antenna_geometry_t *geometry, double cube_edge_length){
-    antenna_geometry_t temp_geometry;
+    antenna_geometry_t temp_geometry{};
     memcpy(&temp_geometry, geometry, sizeof(antenna_geometry_t));
 
-    calculate_wire_vectors(&temp_geometry);
+    calculate_wire_geometry(&temp_geometry);
 
     for(int i = 0; i < WIRE_COUNT; i++){
-        if(temp_geometry.wires[i].end.x > cube_edge_length/2 || temp_geometry.wires[i].end.x < -cube_edge_length/2){
+        if(temp_geometry.geometry[i].end.x > cube_edge_length / 2 || temp_geometry.geometry[i].end.x < -cube_edge_length / 2){
             return false;
         }
-        if(temp_geometry.wires[i].end.y > cube_edge_length/2 || temp_geometry.wires[i].end.y < -cube_edge_length/2){
+        if(temp_geometry.geometry[i].end.y > cube_edge_length / 2 || temp_geometry.geometry[i].end.y < -cube_edge_length / 2){
             return false;
         }
-        if(temp_geometry.wires[i].end.z > cube_edge_length || temp_geometry.wires[i].end.z < 0){
+        if(temp_geometry.geometry[i].end.z > cube_edge_length || temp_geometry.geometry[i].end.z < 0){
             return false;
         }
     }
@@ -123,28 +139,44 @@ void generate_random_antenna_wires(antenna_geometry_t *geometry){
     double segments_lengths[WIRE_COUNT];
     double wavelength;
 
-    cout << "Generating random geometry" << endl;
+    //cout << "Generating random active_elements" << endl;
 
     wavelength = calculate_wavelength(FREQ);
     divide_length_into_random_length_segment(wavelength/2, WIRE_COUNT, segments_lengths);
 
     for(int i = 0; i < WIRE_COUNT; i++){
-        geometry->geometry[i].length = segments_lengths[i];
+        geometry->active_elements[i].length = segments_lengths[i];
         do {
-            geometry->geometry[i].angle_xy = random_angle_in_radina();
-            geometry->geometry[i].angle_xz = random_angle_in_radina();
+            geometry->active_elements[i].angle_xy = random_angle_in_radina();
+            geometry->active_elements[i].angle_xz = random_angle_in_radina();
         } while(!check_if_geometry_fits_in_cube(geometry, wavelength*CUBE_EDGE_LENGTH_RELATIVE_TO_WAVELENGTH));
     }
 }
 
 void generate_test_dipol(antenna_geometry_t *geometry){
-    double wavelength = calculate_wavelength(FREQ)*0.95;
-    double segments_lengths = (wavelength/4)/WIRE_COUNT;
+    double wavelength = calculate_wavelength(FREQ);
+    double segments_lengths = (wavelength*0.25)/WIRE_COUNT*0.99;
 
     for(int i = 0; i < WIRE_COUNT; i++){
-        geometry->geometry[i].length = segments_lengths;
-        geometry->geometry[i].angle_xy = 0;
-        geometry->geometry[i].angle_xz = M_PI/2;
+        geometry->active_elements[i].length = segments_lengths;
+        geometry->active_elements[i].angle_xy = 0;
+        geometry->active_elements[i].angle_xz = M_PI / 2;
+    }
+}
+
+void generate_random_ground_plane(antenna_geometry_t *geometry){
+    double wavelength = calculate_wavelength(FREQ);
+    double segments_lengths = wavelength/8 + ((double)rand() / RAND_MAX) * (wavelength/2 - wavelength/4);
+    double segments_angles_xy = 2 * M_PI / GROUND_PLANE_ELEMENT_COUNT;
+    double segments_angles_xz = random_angle_in_radina();
+
+    segments_lengths = wavelength * 0.25 * 0.9935;
+    segments_angles_xz = (2*M_PI/8)*7;
+
+    for(int i = 0; i < GROUND_PLANE_ELEMENT_COUNT; i++){
+        geometry->ground_plane[i].length = segments_lengths;
+        geometry->ground_plane[i].angle_xy = segments_angles_xy * i;
+        geometry->ground_plane[i].angle_xz = segments_angles_xz;
     }
 }
 
@@ -157,7 +189,8 @@ antenna_geometry_t generate_random_antenna(){
     init_antenna_geometry(&random_antenna);
     generate_test_dipol(&random_antenna);
     //generate_random_antenna_wires(&random_antenna);
-    calculate_wire_vectors(&random_antenna);
+    generate_random_ground_plane(&random_antenna);
+    calculate_wire_geometry(&random_antenna);
     print_antenna_wires(&random_antenna);
 
     return random_antenna;
@@ -165,15 +198,15 @@ antenna_geometry_t generate_random_antenna(){
 
 // -------------------------------------------------------------------------------- //
 
-void save_geometry_to_file(antenna_geometry_t *geometry, const char *file_name){
-    cout << "Saving geometry to file: " << file_name << "\n" << endl;
+void save_geometry_to_file(antenna_geometry_t *geometry, const string& file_name){
+    cout << "Saving active_elements to file: " << file_name << "\n" << endl;
 
     ofstream file;
     file.open(file_name);
 
-    for(int i = 0; i < WIRE_COUNT; i++){
-        file << geometry->wires[i].start.x << "; " << geometry->wires[i].start.y << "; " << geometry->wires[i].start.z << "; ";
-        file << geometry->wires[i].end.x << "; " << geometry->wires[i].end.y << "; " << geometry->wires[i].end.z << "; " << endl;
+    for(int i = 0; i < TOTAL_WIRE_COUNT; i++){
+        file << geometry->geometry[i].start.x << "; " << geometry->geometry[i].start.y << "; " << geometry->geometry[i].start.z << "; ";
+        file << geometry->geometry[i].end.x << "; " << geometry->geometry[i].end.y << "; " << geometry->geometry[i].end.z << "; " << endl;
     }
 
 }

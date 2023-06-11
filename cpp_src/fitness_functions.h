@@ -14,7 +14,7 @@
 
 #include "main.h"
 #include "wire_geometry.h"
-#include "physical_calculations.h"
+#include "utils.h"
 
 // -------------------------------------------------------------------------------- //
 
@@ -30,12 +30,25 @@ struct antenna_impedance_t{
     double Z;
 };
 
+struct antenna_SWR_t{
+    double SWR;
+    double VSWR;
+    double S11;
+};
+
+struct antenna_band_t{
+    double start;
+    double end;
+    double bandwidth;
+};
+
 struct antenna_parameters_t{
     antenna_gain_t gain;
-    double efficiency;
-    double bandwidth;
+    antenna_gain_t RHCP_gain;
+    antenna_gain_t LHCP_gain;
     antenna_impedance_t impedance;
-    double SWR;
+    antenna_SWR_t SWR;
+    antenna_band_t band;
 };
 
 struct antenna_t{

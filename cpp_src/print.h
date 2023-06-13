@@ -31,6 +31,4 @@
 
 void print(int level, char const *format, ...);
 
-
-
 #endif

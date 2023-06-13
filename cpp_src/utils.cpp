@@ -65,5 +65,15 @@ double random_double_in_range(double min, double max){
     return dist(gen);
 }
 
+void random_int_pair_without_repetition(int *a, int *b, int min, int max){
+    *a = random_int_in_range(min, max);
+    *b = random_int_in_range(min, max);
+
+    while(*a == *b){
+        *b = random_int_in_range(min, max);
+    }
+}
 
 
+
+// -------------------------------------------------------------------------------- //

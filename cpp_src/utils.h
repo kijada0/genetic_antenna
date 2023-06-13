@@ -16,5 +16,6 @@ std::string get_current_time();
 
 int random_int_in_range(int min, int max);
 double random_double_in_range(double min, double max);
+void random_int_pair_without_repetition(int *a, int *b, int min, int max);
 
 #endif //GENETIC_ANTENNA_UTILS_H

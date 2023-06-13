@@ -4,17 +4,17 @@ project(genetic_antenna)
 set(CMAKE_CXX_STANDARD 20)
 
 set(CPP_SRC
-    main.cpp
-    main.h
-    wire_geometry.cpp
-    wire_geometry.h
+        main.cpp
+        main.h
+        wire_geometry.cpp
+        wire_geometry.h
         utils.cpp
         utils.h
-    fitness_functions.cpp
-    fitness_functions.h
-    mutation_functions.cpp
-    mutation_functions.h
-)
+        fitness.cpp
+        fitness.h
+        evolution.cpp
+        evolution.h
+    )
 
 # LINKING NECPP
 set(NECPP_SRC

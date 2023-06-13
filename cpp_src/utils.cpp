@@ -4,12 +4,12 @@
 // ---------------------------------------- //
 
 
-#include <math.h>
+#include <cmath>
 #include <chrono>
 #include <ctime>
 #include <string>
 #include <iomanip>
-
+#include <random>
 
 #include "utils.h"
 
@@ -21,9 +21,17 @@ double calculate_wavelength(double freq){
     return LIGHT_SPEED / freq;
 }
 
+// -------------------------------------------------------------------------------- //
+
 double random_angle_in_radina(){
-    return (((double)rand() / RAND_MAX) * 2 * M_PI);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dist(0.0, 2.0 * M_PI);
+
+    return dist(gen);
 }
+
+// -------------------------------------------------------------------------------- //
 
 string get_current_time(){
     auto now = std::chrono::system_clock::now();
@@ -38,3 +46,24 @@ string get_current_time(){
 
     return timeString;
 }
+
+// -------------------------------------------------------------------------------- //
+
+int random_int_in_range(int min, int max){
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(min, max);
+
+    return dist(gen);
+}
+
+double random_double_in_range(double min, double max){
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dist(min, max);
+
+    return dist(gen);
+}
+
+
+

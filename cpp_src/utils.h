@@ -14,4 +14,7 @@ double calculate_wavelength(double freq);
 double random_angle_in_radina();
 std::string get_current_time();
 
+int random_int_in_range(int min, int max);
+double random_double_in_range(double min, double max);
+
 #endif //GENETIC_ANTENNA_UTILS_H

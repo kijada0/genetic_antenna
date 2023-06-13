@@ -8,6 +8,7 @@
 #include <math.h>
 #include <fstream>
 #include <cstring>
+#include <iomanip>
 
 #include "wire_geometry.h"
 #include "utils.h"
@@ -116,7 +117,6 @@ bool check_if_geometry_fits_in_cube(antenna_geometry_t *geometry, double cube_ed
 // -------------------------------------------------------------------------------- //
 
 void divide_length_into_random_length_segment(double length, int element, double *target){
-    rand();
     double length_sum = 0.0;
     double offset = 0.75;
     double min_length = (length/element) * (1 - offset);
@@ -125,7 +125,7 @@ void divide_length_into_random_length_segment(double length, int element, double
     // cout << "Dividing length: " << length << " into " << element << " elements" << endl;
 
     for(int i = 0; i < element-1; i++){
-        target[i] =  min_length + ((double)rand() / RAND_MAX) * (max_length - min_length);
+        target[i] = random_double_in_range(min_length, max_length);
         length_sum += target[i];
     }
     target[element-1] = length - length_sum;
@@ -155,7 +155,7 @@ void generate_random_antenna_wires(antenna_geometry_t *geometry){
 
 void generate_test_dipol(antenna_geometry_t *geometry){
     double wavelength = calculate_wavelength(FREQ);
-    double segments_lengths = (wavelength*0.25)/WIRE_COUNT*0.99;
+    double segments_lengths = (wavelength*0.25*0.9)/WIRE_COUNT;
 
     for(int i = 0; i < WIRE_COUNT; i++){
         geometry->active_elements[i].length = segments_lengths;
@@ -166,12 +166,12 @@ void generate_test_dipol(antenna_geometry_t *geometry){
 
 void generate_random_ground_plane(antenna_geometry_t *geometry){
     double wavelength = calculate_wavelength(FREQ);
-    double segments_lengths = wavelength/8 + ((double)rand() / RAND_MAX) * (wavelength/2 - wavelength/4);
+    double segments_lengths = random_double_in_range(wavelength/8, wavelength/2);
     double segments_angles_xy = 2 * M_PI / GROUND_PLANE_ELEMENT_COUNT;
     double segments_angles_xz = random_angle_in_radina();
 
-    segments_lengths = wavelength * 0.25 * 0.9935;
-    segments_angles_xz = (2*M_PI/8)*7;
+    //segments_lengths = wavelength * 0.28 * 0.9;
+    //segments_angles_xz = (2*M_PI/8)*7;
 
     for(int i = 0; i < GROUND_PLANE_ELEMENT_COUNT; i++){
         geometry->ground_plane[i].length = segments_lengths;
@@ -187,11 +187,11 @@ antenna_geometry_t generate_random_antenna(){
     antenna_geometry_t random_antenna{};
 
     init_antenna_geometry(&random_antenna);
-    generate_test_dipol(&random_antenna);
-    //generate_random_antenna_wires(&random_antenna);
+    //generate_test_dipol(&random_antenna);
+    generate_random_antenna_wires(&random_antenna);
     generate_random_ground_plane(&random_antenna);
     calculate_wire_geometry(&random_antenna);
-    print_antenna_wires(&random_antenna);
+    //print_antenna_wires(&random_antenna);
 
     return random_antenna;
 }
@@ -203,6 +203,8 @@ void save_geometry_to_file(antenna_geometry_t *geometry, const string& file_name
 
     ofstream file;
     file.open(file_name);
+
+    file << std::fixed << std::setprecision(5);
 
     for(int i = 0; i < TOTAL_WIRE_COUNT; i++){
         file << geometry->geometry[i].start.x << "; " << geometry->geometry[i].start.y << "; " << geometry->geometry[i].start.z << "; ";

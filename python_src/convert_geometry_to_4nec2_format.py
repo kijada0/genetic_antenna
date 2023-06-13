@@ -27,14 +27,14 @@ def read_file(file_name):
 
 def convert_to_4nec2_format(geometry):
     for wire, num in zip(geometry, range(len(geometry))):
-        line = "GW {} {} {} {} {} {} {} {} {}".format(num, 10, wire[0], wire[1], wire[2], wire[3], wire[4], wire[5], 0.005)
+        line = "GW {} {} {} {} {} {} {} {} {}".format(num, 4, wire[0], wire[1], wire[2], wire[3], wire[4], wire[5], 0.003)
         print(line)
 
 
 def convert_to_maa_format(geometry):
     print(len(geometry))
     for wire, num in zip(geometry, range(len(geometry))):
-        line = "{}, {}, {}, {}, {}, {}, {}, {}".format(wire[0], wire[1], wire[2], wire[3], wire[4], wire[5], 0.005, -1)
+        line = "{}, {}, {}, {}, {}, {}, {}, {}".format(wire[0], wire[1], wire[2], wire[3], wire[4], wire[5], 0.003, -1)
         print(line)
 
 

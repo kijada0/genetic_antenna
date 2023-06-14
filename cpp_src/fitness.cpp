@@ -216,9 +216,7 @@ int calculate_antenna_fitness(antenna_parameters_t *parameters){
     //printf("Fitness calculation...\n");
     //printf("Error flag: %d\n", parameters->error_flag);
     if(parameters->error_flag == 1){
-        printf("Deth\n");
         fitness = -999999999;
-        printf("Fitness: %d\n", fitness);
         return fitness;
     }
 
@@ -245,14 +243,15 @@ int calculate_antenna_fitness(antenna_parameters_t *parameters){
 
 // -------------------------------------------------------------------------------- //
 
-void sort_antennas_by_fitness(antenna_t *population, int *ranking){
+void sort_antennas_by_fitness(antenna_t *population, int *ranking, int population_size){
+    printf("Sort antennas by fitness...\n");
     int i, j, temp;
-    for(i=0; i<POPULATION_SIZE; i++){
+    for(i=0; i<population_size; i++){
         ranking[i] = i;
     }
 
-    for(i=0; i<POPULATION_SIZE; i++){
-        for(j=i+1; j<POPULATION_SIZE; j++){
+    for(i=0; i<population_size; i++){
+        for(j=i+1; j<population_size; j++){
             if(population[ranking[i]].fitness < population[ranking[j]].fitness){
                 temp = ranking[i];
                 ranking[i] = ranking[j];

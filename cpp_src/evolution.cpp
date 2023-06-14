@@ -3,15 +3,16 @@
 // created date: 12-06-2023
 // ---------------------------------------- //
 
+#include <cstring>
+
 #include "main.h"
 #include "utils.h"
 #include "wire_geometry.h"
 #include "fitness.h"
 
-
 // -------------------------------------------------------------------------------- //
 
-void create_population_zero(antenna_t *population, int population_size){
+void create_generation_zero(antenna_t *population, int population_size){
     for(int i = 0; i < population_size; i++){
         population[i].geometry = generate_random_antenna();
     }
@@ -85,17 +86,25 @@ void antenna_mutation(antenna_t *child, double mutation_rate){
 
 // -------------------------------------------------------------------------------- //
 
-void create_population_from_parents(antenna_t *population, antenna_t *parents, int *ranking, int population_size, int parent_count){
+void create_next_generation(antenna_t *population, antenna_t *parents, int *ranking, int population_size, int parent_count){
+    printf("Creating next generation...\n");
     antenna_t new_population[population_size];
     for(int i = 0; i < population_size; i++){
         int parent_A_ranking_index, parent_B_ranking_index;
         random_int_pair_without_repetition(&parent_A_ranking_index, &parent_B_ranking_index, 0, parent_count-1);
-        int parent_A_index = ranking[parent_A_ranking_index], parent_B_index = ranking[parent_B_ranking_index];
+
+        int parent_A_index = ranking[parent_A_ranking_index];
+        int parent_B_index = ranking[parent_B_ranking_index];
+        printf("Parent A: %d, Parent B: %d\n", parent_A_index, parent_B_index);
 
         antenna_crossing_over(&new_population[i], &parents[parent_A_index], &parents[parent_B_index]);
         antenna_mutation(&new_population[i], MUTATION_RATE);
         calculate_wire_geometry(&new_population[i].geometry);
     }
+
+    memcpy(population, &new_population, sizeof(antenna_t) * population_size);
+    printf("Next generation created.\n");
+    printf("--------------------------------------------------\n");
 }
 
 // -------------------------------------------------------------------------------- //

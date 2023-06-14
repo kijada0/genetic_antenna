@@ -15,8 +15,8 @@
 
 // -------------------------------------------------------------------------------- //
 
-void create_population_zero(antenna_t *population, int population_size);
-void create_population_from_parents(antenna_t *population, antenna_t *parents, int *ranking, int population_size, int parent_count);
+void create_generation_zero(antenna_t *population, int population_size);
+void create_next_generation(antenna_t *population, antenna_t *parents, int *ranking, int population_size, int parent_count);
 
 void save_population_to_file(antenna_t *population, int population_size);
 void load_population_from_file(antenna_t *population, int population_size);

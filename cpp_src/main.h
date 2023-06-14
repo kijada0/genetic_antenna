@@ -19,13 +19,13 @@
 
 // ---------------------------------------- //
 // Population parameters //
-#define POPULATION_SIZE 512
-#define PARENT_COUNT 128
+#define POPULATION_SIZE 8
+#define PARENT_COUNT 2
 #define MUTATION_RATE 0.08
 
 
 // ---------------------------------------- //
 // System parameters //
-#define MAX_THREAD_COUNT 24
+#define MAX_THREAD_COUNT 4
 
 #endif //GENETIC_ANTENNA_MAIN_H

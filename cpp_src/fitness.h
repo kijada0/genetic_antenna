@@ -81,7 +81,7 @@ antenna_parameters_t calculate_antenna_parameters(antenna_geometry_t *geometry);
 void print_antenna_parameters(antenna_parameters_t *parameters);
 
 int calculate_antenna_fitness(antenna_parameters_t *parameters);
-void sort_antennas_by_fitness(antenna_t *population, int *ranking);
+void sort_antennas_by_fitness(antenna_t *population, int *ranking, int population_size);
 
 
 

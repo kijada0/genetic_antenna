@@ -16,19 +16,46 @@
 using namespace std;
 using namespace std::chrono;
 
+int cycle_count = 0;
+
 // -------------------------------------------------------------------------------- //
 
-void process_antenna(int individual_number, antenna_t *sub_population) {
+void process_antenna(int individual_number, antenna_t *sub_population, int process_id) {
     for(int i = 0; i < individual_number; i++) {
-        sub_population[i].geometry = generate_random_antenna();
+        string file_name = "out/geometry_" + to_string(i) + "_" + to_string(cycle_count) + + "_" + to_string(process_id) + ".txt";
+        save_geometry_to_file(&sub_population[i].geometry, file_name);
         sub_population[i].parameters = calculate_antenna_parameters(&sub_population[i].geometry);
-        //print_antenna_parameters(&sub_population->parameters);
         sub_population[i].fitness = calculate_antenna_fitness(&sub_population[i].parameters);
-
-        //string filename = "test_" + get_current_time() + "_" + to_string(rand()%1000) + ".txt";
-        //save_geometry_to_file(&sub_population->geometry, "test.txt");
     }
 }
+
+void distributes_computations_across_threads(antenna_t *population) {
+    thread threads[MAX_THREAD_COUNT];
+    int individuals_per_thread = POPULATION_SIZE / MAX_THREAD_COUNT;
+    int remaining_individuals = POPULATION_SIZE % MAX_THREAD_COUNT;
+
+    int index_of_first_individual_in_current_sub_population = 0;
+    int i;
+
+    remaining_individuals = POPULATION_SIZE % MAX_THREAD_COUNT;
+    for (i = 0; i < MAX_THREAD_COUNT; i++) {
+        int number_of_individuals_for_thread = individuals_per_thread;
+        if(remaining_individuals > 0) {
+            number_of_individuals_for_thread++;
+            remaining_individuals--;
+        }
+        printf("creating thread, %d, individuals %d, index %d\n", i, number_of_individuals_for_thread, index_of_first_individual_in_current_sub_population);
+        threads[i] = thread(process_antenna, number_of_individuals_for_thread, &population[index_of_first_individual_in_current_sub_population], i);
+        index_of_first_individual_in_current_sub_population += number_of_individuals_for_thread;
+    }
+
+    for (i = 0; i < MAX_THREAD_COUNT; i++) {
+        threads[i].join();
+    }
+}
+
+
+// -------------------------------------------------------------------------------- //
 
 double get_duration_in_s(high_resolution_clock::time_point start){
     auto stop = high_resolution_clock::now();
@@ -38,55 +65,33 @@ double get_duration_in_s(high_resolution_clock::time_point start){
     return duration_in_s;
 }
 
+// -------------------------------------------------------------------------------- //
 
 int main() {
     auto start = high_resolution_clock::now();
 
-    thread threads[MAX_THREAD_COUNT];
-    int individuals_per_thread = POPULATION_SIZE / MAX_THREAD_COUNT;
-    int remaining_individuals = POPULATION_SIZE % MAX_THREAD_COUNT;
-    int counter = 0;
+    static antenna_t population[POPULATION_SIZE];
+    static int ranking[POPULATION_SIZE];
 
-    antenna_t population[POPULATION_SIZE];
-    int index_of_first_individual_in_current_sub_population = 0;
+    create_generation_zero(&population[0], POPULATION_SIZE);
 
-    //while(get_duration_in_s(start) < 300) {
-        remaining_individuals = POPULATION_SIZE % MAX_THREAD_COUNT;
-        printf("--------------------------------------------------------------------------------\n");
-        for (int i = 0; i < MAX_THREAD_COUNT; i++) {
-            int number_of_individuals_for_thread = individuals_per_thread;
-            if(remaining_individuals > 0) {
-                number_of_individuals_for_thread++;
-                remaining_individuals--;
-            }
-            printf("creating thread, %d, individuals %d, index %d\n", i, number_of_individuals_for_thread, index_of_first_individual_in_current_sub_population);
-            threads[i] = thread(process_antenna, number_of_individuals_for_thread, &population[index_of_first_individual_in_current_sub_population]);
-            index_of_first_individual_in_current_sub_population += number_of_individuals_for_thread;
-        }
+    while(get_duration_in_s(start) < 10 && cycle_count < 5){
+        distributes_computations_across_threads(&population[0]);
+        sort_antennas_by_fitness(&population[0], &ranking[0], POPULATION_SIZE);
+        create_next_generation(&population[0], &population[0], &ranking[0], POPULATION_SIZE, POPULATION_SIZE);
+        cycle_count++;
+    }
 
-        for (int i = 0; i < MAX_THREAD_COUNT; i++) {
-            threads[i].join();
-        }
-        counter++;
-    //}
+    sort_antennas_by_fitness(&population[0], &ranking[0], POPULATION_SIZE);
+    for(int i = 0; i < POPULATION_SIZE; i++) {
+        printf("%d fitness: %d \n", i+1, population[i].fitness);
+    }
 
-    int ranking[POPULATION_SIZE];
-    sort_antennas_by_fitness(&population[0], &ranking[0]);
-
-    antenna_t sub_population{};
-    process_antenna(1, &sub_population);
-
-
-    printf("--------------------------------------------------------------------------------\n");
-    printf("Cycle count: %d\n", counter);
-    printf("Avg cycle time: %.3f s\n", get_duration_in_s(start)/(float)counter);
-    printf("--------------------------------------------------------------------------------\n");
+    printf("----------------------------------------\n");
 
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
-    cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
-    cout << "Time taken by function: " << duration.count()/1000 << " ms" << endl;
-    cout << "Time taken by function: " << duration.count()/1000000 << " s" << endl;
+    printf("Time taken by function: %.3f", (double)duration.count()/1000000);
 
     return 0;
 }

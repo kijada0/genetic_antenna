@@ -10,6 +10,8 @@
 #include <string>
 #include <iomanip>
 #include <random>
+#include <thread>
+#include <filesystem>
 
 #include "utils.h"
 
@@ -74,6 +76,26 @@ void random_int_pair_without_repetition(int *a, int *b, int min, int max){
     }
 }
 
+// -------------------------------------------------------------------------------- //
 
+void delay(int milliseconds){
+    this_thread::sleep_for(chrono::milliseconds(milliseconds));
+}
+
+// -------------------------------------------------------------------------------- //
+
+void create_folder_if_not_exist(const string &folderPath) {
+    if (!filesystem::exists(folderPath)){
+        if (std::filesystem::create_directory(folderPath)) {
+            printf("Utworzono folder: %s\n", folderPath.c_str());
+        }
+        else{
+            printf("Nie udało się utworzyć folderu: %s\n", folderPath.c_str());
+        }
+    }
+    else{
+        printf("Folder %s już istnieje\n", folderPath.c_str());
+    }
+}
 
 // -------------------------------------------------------------------------------- //

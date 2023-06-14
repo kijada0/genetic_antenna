@@ -44,6 +44,10 @@ void calculate_wire_geometry(antenna_geometry_t *geometry);
 
 void save_geometry_to_file(antenna_geometry_t *geometry, const std::string& file_name);
 void print_antenna_geometry(antenna_geometry_t *geometry);
+void print_antenna_wires_parameters(antenna_geometry_t *geometry);
+void print_antenna_wires(antenna_geometry_t *geometry);
+
+void clear_antenna_geometry(antenna_geometry_t *geometry);
 
 // -------------------------------------------------------------------------------- //
 

@@ -37,7 +37,7 @@ void init_antenna_geometry(antenna_geometry_t *geometry){
 
 void print_antenna_geometry(antenna_geometry_t *geometry){
     cout << "\nAntenna active_elements: " << endl;
-    for(int i = 0; i < WIRE_COUNT; i++){
+    for(int i = 0; i < TOTAL_WIRE_COUNT; i++){
         cout << "----------------------------------------" << endl;
         cout << "Wire " << i+1 << " start: " << geometry->geometry[i].start.x << " " << geometry->geometry[i].start.y << " " << geometry->geometry[i].start.z << endl;
         cout << "Wire " << i+1 << " end: " << geometry->geometry[i].end.x << " " << geometry->geometry[i].end.y << " " << geometry->geometry[i].end.z << endl;
@@ -56,6 +56,20 @@ void print_antenna_wires(antenna_geometry_t *geometry){
         printf("end -> x: %.3f  y: %.3f  z: %.3f\n", geometry->geometry[i].end.x, geometry->geometry[i].end.y, geometry->geometry[i].end.z);
     }
     cout << "----------------------------------------\n" << endl;
+}
+
+void print_antenna_wires_parameters(antenna_geometry_t *geometry){
+    int i, j;
+    for(i = 0; i < WIRE_COUNT; i++){
+        printf("wire a  %d \t->  length: %.3f \t", i+1, geometry->active_elements[i].length);
+        printf("angle_xy: %.3f \t", geometry->active_elements[i].angle_xy);
+        printf("angle_xz: %.3f\n", geometry->active_elements[i].angle_xz);
+    }
+    for(j = 0; j < GROUND_PLANE_ELEMENT_COUNT; j++){
+        printf("wire gp %d \t->  length: %.3f \t", i+j+1, geometry->ground_plane[j].length);
+        printf("angle_xy: %.3f \t", geometry->ground_plane[j].angle_xy);
+        printf("angle_xz: %.3f\n", geometry->ground_plane[j].angle_xz);
+    }
 }
 
 // -------------------------------------------------------------------------------- //
@@ -218,5 +232,32 @@ void save_geometry_to_file(antenna_geometry_t *geometry, const string& file_name
 double calculate_wire_length(wire_vector_t *wire){
     return sqrt(pow(wire->end.x - wire->start.x, 2) + pow(wire->end.y - wire->start.y, 2) + pow(wire->end.z - wire->start.z, 2));
 }
+
+// -------------------------------------------------------------------------------- //
+
+void clear_antenna_geometry(antenna_geometry_t *geometry){
+    int i;
+    for(i = 0; i < TOTAL_WIRE_COUNT; i++){
+        geometry->geometry[i].start.x = 0;
+        geometry->geometry[i].start.y = 0;
+        geometry->geometry[i].start.z = 0;
+        geometry->geometry[i].end.x = 0;
+        geometry->geometry[i].end.y = 0;
+        geometry->geometry[i].end.z = 0;
+    }
+
+    for(i = 0; i< WIRE_COUNT; i++){
+        geometry->active_elements[i].length = 0;
+        geometry->active_elements[i].angle_xy = 0;
+        geometry->active_elements[i].angle_xz = 0;
+    }
+
+    for(i = 0; i< GROUND_PLANE_ELEMENT_COUNT; i++){
+        geometry->ground_plane[i].length = 0;
+        geometry->ground_plane[i].angle_xy = 0;
+        geometry->ground_plane[i].angle_xz = 0;
+    }
+}
+
 
 // -------------------------------------------------------------------------------- //

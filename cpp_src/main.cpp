@@ -22,8 +22,10 @@ int cycle_count = 0;
 
 void process_antenna(int individual_number, antenna_t *sub_population, int process_id) {
     for(int i = 0; i < individual_number; i++) {
+        //delay(1000*process_id);
         string file_name = "out/geometry_" + to_string(i) + "_" + to_string(cycle_count) + + "_" + to_string(process_id) + ".txt";
-        save_geometry_to_file(&sub_population[i].geometry, file_name);
+        //save_geometry_to_file(&sub_population[i].geometry, file_name);
+        //print_antenna_wires_parameters(&sub_population[i].geometry);
         sub_population[i].parameters = calculate_antenna_parameters(&sub_population[i].geometry);
         sub_population[i].fitness = calculate_antenna_fitness(&sub_population[i].parameters);
     }
@@ -44,7 +46,7 @@ void distributes_computations_across_threads(antenna_t *population) {
             number_of_individuals_for_thread++;
             remaining_individuals--;
         }
-        printf("creating thread, %d, individuals %d, index %d\n", i, number_of_individuals_for_thread, index_of_first_individual_in_current_sub_population);
+        //printf("creating thread, %d, individuals %d, index %d\n", i, number_of_individuals_for_thread, index_of_first_individual_in_current_sub_population);
         threads[i] = thread(process_antenna, number_of_individuals_for_thread, &population[index_of_first_individual_in_current_sub_population], i);
         index_of_first_individual_in_current_sub_population += number_of_individuals_for_thread;
     }
@@ -75,17 +77,15 @@ int main() {
 
     create_generation_zero(&population[0], POPULATION_SIZE);
 
-    while(get_duration_in_s(start) < 10 && cycle_count < 5){
+    while(get_duration_in_s(start) < 300 && cycle_count < 25){
         distributes_computations_across_threads(&population[0]);
         sort_antennas_by_fitness(&population[0], &ranking[0], POPULATION_SIZE);
-        create_next_generation(&population[0], &population[0], &ranking[0], POPULATION_SIZE, POPULATION_SIZE);
+        save_sorted_population_to_file(&population[0], &ranking[0], POPULATION_SIZE);
+        create_next_generation(&population[0], &population[0], &ranking[0], POPULATION_SIZE, PARENT_COUNT);
         cycle_count++;
     }
 
     sort_antennas_by_fitness(&population[0], &ranking[0], POPULATION_SIZE);
-    for(int i = 0; i < POPULATION_SIZE; i++) {
-        printf("%d fitness: %d \n", i+1, population[i].fitness);
-    }
 
     printf("----------------------------------------\n");
 

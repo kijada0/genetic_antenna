@@ -8,7 +8,7 @@
 
 // ---------------------------------------- //
 // Antenna parameters //
-#define WIRE_COUNT 8
+#define WIRE_COUNT 4
 #define GROUND_PLANE_ELEMENT_COUNT 4
 #define TOTAL_WIRE_COUNT (WIRE_COUNT+GROUND_PLANE_ELEMENT_COUNT)
 #define CUBE_EDGE_LENGTH_RELATIVE_TO_WAVELENGTH 0.5
@@ -19,13 +19,21 @@
 
 // ---------------------------------------- //
 // Population parameters //
-#define POPULATION_SIZE 8
-#define PARENT_COUNT 2
+#define POPULATION_SIZE 16
+#define PARENT_COUNT 4
 #define MUTATION_RATE 0.08
 
 
 // ---------------------------------------- //
 // System parameters //
-#define MAX_THREAD_COUNT 4
+#define MAX_THREAD_COUNT 2
+
+// ---------------------------------------- //
+
+#ifdef WIN32
+    #define OUTPUT_FILE_DIRECTORY "../out/"
+#else
+    #define OUTPUT_FILE_DIRECTORY "/home/kijada/genetic/out/"
+#endif
 
 #endif //GENETIC_ANTENNA_MAIN_H

@@ -201,8 +201,8 @@ antenna_parameters_t calculate_antenna_parameters(antenna_geometry_t *geometry){
         parameters.error_flag = 0;
     }
     catch (nec_exception* e) {
-        cout << e->get_message() << endl;
-        printf("Error in NEC calculation!\n");
+        //cout << e->get_message() << endl;
+        //printf("Error in NEC calculation!\n");
         parameters.error_flag = 1;
     }
 
@@ -246,12 +246,12 @@ int calculate_antenna_fitness(antenna_parameters_t *parameters){
 void sort_antennas_by_fitness(antenna_t *population, int *ranking, int population_size){
     printf("Sort antennas by fitness...\n");
     int i, j, temp;
-    for(i=0; i<population_size; i++){
+    for(i = 0; i < population_size; i++){
         ranking[i] = i;
     }
 
-    for(i=0; i<population_size; i++){
-        for(j=i+1; j<population_size; j++){
+    for(i = 0; i < population_size; i++){
+        for(j = i+1; j < population_size; j++){
             if(population[ranking[i]].fitness < population[ranking[j]].fitness){
                 temp = ranking[i];
                 ranking[i] = ranking[j];
@@ -259,6 +259,40 @@ void sort_antennas_by_fitness(antenna_t *population, int *ranking, int populatio
             }
         }
     }
+
+    for(i = 0; i < population_size; i++){
+        printf("%d. antenna: %d  \t fittnes: %d\n", i, ranking[i], population[ranking[i]].fitness);
+    }
 }
 
+// -------------------------------------------------------------------------------- //
 
+void clear_antenna_parameters(antenna_parameters_t *parameters){
+    parameters->gain.max = 0;
+    parameters->gain.min = 0;
+    parameters->gain.mean = 0;
+
+    parameters->RHCP_gain.max = 0;
+    parameters->RHCP_gain.min = 0;
+    parameters->RHCP_gain.mean = 0;
+
+    parameters->LHCP_gain.max = 0;
+    parameters->LHCP_gain.min = 0;
+    parameters->LHCP_gain.mean = 0;
+
+    parameters->impedance.real = 0;
+    parameters->impedance.imag = 0;
+    parameters->impedance.Z = 0;
+
+    parameters->SWR.SWR = 0;
+    parameters->SWR.VSWR = 0;
+    parameters->SWR.S11 = 0;
+
+    parameters->band.start = 0;
+    parameters->band.end = 0;
+    parameters->band.bandwidth = 0;
+
+    parameters->error_flag = 0;
+}
+
+// -------------------------------------------------------------------------------- //

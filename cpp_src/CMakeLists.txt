@@ -18,7 +18,6 @@ set(CPP_SRC
 
 # LINKING NECPP
 set(NECPP_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/config.h
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/c_ggrid.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/matrix_algebra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/nec_ground.cpp
@@ -34,6 +33,8 @@ set(NECPP_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/electromag.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/nec_results.cpp
 )
+
+
 
 # ADD EXECUTABLE
 add_executable(genetic_antenna ${NECPP_SRC} ${CPP_SRC})
@@ -54,6 +55,9 @@ if (WIN32)
 
 else ()
     message("it's Linux")
+
+    add_executable(genetic_antenna ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/config.h)
+
     target_compile_options(genetic_antenna PRIVATE -Ofast -Wall -march=nehalem)
 
     find_package(LAPACK REQUIRED)

@@ -14,6 +14,8 @@ set(CPP_SRC
         fitness.h
         evolution.cpp
         evolution.h
+        print.cpp
+        print.h
     )
 
 # LINKING NECPP
@@ -32,6 +34,7 @@ set(NECPP_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/nec_structure_currents.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/electromag.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/src/nec_results.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/config.h
 )
 
 
@@ -55,8 +58,6 @@ if (WIN32)
 
 else ()
     message("it's Linux")
-
-    add_executable(genetic_antenna ${CMAKE_CURRENT_SOURCE_DIR}/lib/necpp/config.h)
 
     target_compile_options(genetic_antenna PRIVATE -Ofast -Wall -march=nehalem)
 

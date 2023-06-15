@@ -5,12 +5,36 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
+#include "print.h"
+
+using namespace std;
+
+int print_level = 3;
+
+const char* get_current_time() {
+    struct timeval tmnow{};
+    gettimeofday(&tmnow, nullptr);
+    struct tm* tm = localtime(&tmnow.tv_sec);
+
+    char time_buf[30];
+    char usec_buf[10];
+
+    strftime(time_buf, 30, "%y%m%d%H%M%S", tm);
+    snprintf(usec_buf, 10, "%03d", static_cast<int>(tmnow.tv_usec / 1000));
+
+    static char timestamp[40];
+    snprintf(timestamp, 40, "%s%s", time_buf, usec_buf);
+
+    return timestamp;
+}
+
 void print(int level, const char *format, ...)
 {
     va_list args;
     char buf[256];
     char time_buf[30];
     char usec_buf[10];
+    char log_file_path[256];
     struct stat st{};
     struct timeval tmnow{};
     struct tm *tm;
@@ -20,13 +44,16 @@ void print(int level, const char *format, ...)
     int ret;
 
     if (level <= print_level) {
+
+        sprintf(log_file_path, "%s%s%s", LOG_FILE_PATH, LOG_FILE_NAME, LOG_FILE_EXTENSION);
+
         va_start(args, format);
         vsnprintf(buf, sizeof(buf), format, args);
         va_end(args);
 
-        ret = stat(LOG_FILE_PATH, &st);
+        ret = stat(log_file_path, &st);
 
-        gettimeofday(&tmnow, NULL);
+        gettimeofday(&tmnow, nullptr);
         tm = localtime(&tmnow.tv_sec);
         strftime(time_buf, 30, "%Y.%m.%d %H:%M:%S.", tm);
         snprintf(usec_buf, 10, "%03d", (int)tmnow.tv_usec / 1000); // ms
@@ -35,13 +62,13 @@ void print(int level, const char *format, ...)
         if (st.st_size > LOG_SIZE || ret) {
             if (ret == 0) {
                 char old_name[256];
-                sprintf(old_name, "%s_old", LOG_FILE_PATH);
+                sprintf(old_name, "%s%s_%s%s", LOG_FILE_PATH, LOG_FILE_NAME, get_current_time(), LOG_FILE_EXTENSION);
                 remove(old_name);
-                rename(LOG_FILE_PATH, old_name);
+                rename(log_file_path, old_name);
             }
-            log = fopen(LOG_FILE_PATH, "w");
+            log = fopen(log_file_path, "w");
         } else {
-            log = fopen(LOG_FILE_PATH, "a+");
+            log = fopen(log_file_path, "a+");
         }
 
         if (log) {

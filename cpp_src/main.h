@@ -19,14 +19,13 @@
 
 // ---------------------------------------- //
 // Population parameters //
-#define POPULATION_SIZE 16
-#define PARENT_COUNT 4
+#define POPULATION_SIZE 512
+#define PARENT_COUNT 128
 #define MUTATION_RATE 0.08
-
 
 // ---------------------------------------- //
 // System parameters //
-#define MAX_THREAD_COUNT 2
+#define MAX_THREAD_COUNT 24
 
 // ---------------------------------------- //
 
@@ -35,5 +34,15 @@
 #else
     #define OUTPUT_FILE_DIRECTORY "/home/kijada/genetic/out/"
 #endif
+
+// ---------------------------------------- //
+
+#define SAVE_POPULATION_PERIOD 10
+#define TELEMETRY_RANGE 10
+
+// ---------------------------------------- //
+
+
+
 
 #endif //GENETIC_ANTENNA_MAIN_H

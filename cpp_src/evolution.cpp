@@ -6,6 +6,8 @@
 #include <cstring>
 #include <string>
 
+#include "print.h"
+
 #include "main.h"
 #include "utils.h"
 #include "wire_geometry.h"
@@ -27,9 +29,11 @@ void inti_population(antenna_t *population, int population_size){
 // -------------------------------------------------------------------------------- //
 
 void create_generation_zero(antenna_t *population, int population_size){
+    pr_info("Creating generation zero...");
     for(int i = 0; i < population_size; i++){
         population[i].geometry = generate_random_antenna();
     }
+    pr_debug("Generation zero created.");
 }
 
 // -------------------------------------------------------------------------------- //
@@ -98,7 +102,7 @@ void antenna_mutation(antenna_t *child, double mutation_rate){
 // -------------------------------------------------------------------------------- //
 
 void create_next_generation(antenna_t *population, antenna_t *parents, int *ranking, int population_size, int parent_count){
-    printf("Creating next generation...\n");
+    pr_info("Creating next generation");
     antenna_t new_population[population_size];
     inti_population(&new_population[0], population_size);
     for(int i = 0; i < population_size; i++){
@@ -107,7 +111,7 @@ void create_next_generation(antenna_t *population, antenna_t *parents, int *rank
 
         int parent_A_index = ranking[parent_A_ranking_index];
         int parent_B_index = ranking[parent_B_ranking_index];
-        printf("Parent A: %d (%d), Parent B: %d(%d) \n", parent_A_index, parent_A_ranking_index, parent_B_index, parent_B_ranking_index);
+        pr_debug("Parent A: %d (%d), Parent B: %d(%d) \n", parent_A_index, parent_A_ranking_index, parent_B_index, parent_B_ranking_index);
 
         antenna_crossing_over(&new_population[i], &parents[parent_A_index], &parents[parent_B_index]);
         antenna_mutation(&new_population[i], MUTATION_RATE);
@@ -115,19 +119,20 @@ void create_next_generation(antenna_t *population, antenna_t *parents, int *rank
     }
 
     memcpy(population, &new_population, sizeof(antenna_t) * population_size);
-    printf("Next generation created.\n");
-    printf("--------------------------------------------------\n");
+    pr_debug("Next generation created.");
 }
 
 // -------------------------------------------------------------------------------- //
 
 void save_sorted_population_to_file(antenna_t *population, int *ranking, int population_size){
+    pr_debug("Saving population to file...");
     create_folder_if_not_exist(string(OUTPUT_FILE_DIRECTORY));
     string file_name = string(OUTPUT_FILE_DIRECTORY) + "population_" + get_current_time() + ".csv";
     FILE *file = fopen(file_name.c_str(), "w");
 
     if(file == nullptr){
         printf("Error opening file!\n");
+        pr_error("Error opening file!");
         exit(1);
     }
 
@@ -162,7 +167,43 @@ void save_sorted_population_to_file(antenna_t *population, int *ranking, int pop
     }
 
     fclose(file);
-    printf("Population saved to file: %s \n", file_name.c_str());
+    pr_info("Population saved to file... %s", file_name.c_str());
+}
+
+// -------------------------------------------------------------------------------- //
+
+void save_telemetry(antenna_t *population, int *ranking, int population_size, int generation_number, int range, double generation_duration){
+    create_folder_if_not_exist(string(OUTPUT_FILE_DIRECTORY));
+    string file_path = string(OUTPUT_FILE_DIRECTORY) + "telemetry.csv";
+
+    FILE *file = fopen(file_path.c_str(), "a");
+
+    if(file == nullptr){
+        printf("File does not exist. Creating new file.\n");
+        pr_error("File does not exist. Creating new file.");
+        file = fopen(file_path.c_str(), "w");
+        if(file == nullptr){
+            printf("Error creating file!\n");
+            pr_error("Error creating file!");
+            exit(1);
+        }
+    }
+
+    string line = "";
+
+    // line += get_current_time() + "; ";
+    line += to_string(get_current_timestamp()) + "; ";
+    line += to_string(generation_number) + "; ";
+    line += to_string(generation_duration) + "; ";
+
+    for(int i = 0; i < range; i++){
+        line += to_string(population[ranking[i]].fitness) + "; ";
+    }
+
+    fprintf(file, "%s\n", line.c_str());
+    fclose(file);
+
+    pr_info("Saving telemetry... %s", file_path.c_str());
 }
 
 // -------------------------------------------------------------------------------- //

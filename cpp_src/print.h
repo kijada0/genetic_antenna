@@ -3,7 +3,15 @@
 
 #include <cinttypes>
 
-#define LOG_FILE_PATH "evolution.log"
+#ifdef WIN32
+    #define LOG_FILE_PATH "../"
+#else
+    #define LOG_FILE_PATH "/home/kijada/genetic/"
+#endif
+
+#define LOG_FILE_NAME "evolution"
+#define LOG_FILE_EXTENSION ".log"
+
 #define LOG_SIZE (4096L*4096L)
 
 #define PRINT_LEVEL_ALWAYS      -1
@@ -27,7 +35,6 @@
 
 #define pr_malloc(__format, __x...)   print(PRINT_LEVEL_DEBUG,"malloc: " __format " <%s:%d>" , ##__x, __FUNCTION__, __LINE__)
 #define pr_free(__format, __x...)   print(PRINT_LEVEL_DEBUG,"free: " __format " <%s:%d>" , ##__x, __FUNCTION__, __LINE__)
-
 
 void print(int level, char const *format, ...);
 

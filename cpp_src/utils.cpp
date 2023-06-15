@@ -15,22 +15,14 @@
 
 #include "utils.h"
 
+#include "print.h"
+
 using namespace std;
 
 // -------------------------------------------------------------------------------- //
 
 double calculate_wavelength(double freq){
     return LIGHT_SPEED / freq;
-}
-
-// -------------------------------------------------------------------------------- //
-
-double random_angle_in_radina(){
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<double> dist(0.0, 2.0 * M_PI);
-
-    return dist(gen);
 }
 
 // -------------------------------------------------------------------------------- //
@@ -47,6 +39,16 @@ string get_current_time(){
     std::string timeString = ss.str();
 
     return timeString;
+}
+
+long long get_current_timestamp() {
+    auto now = std::chrono::system_clock::now();
+    auto duration = now.time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::seconds>(duration).count();
+}
+
+void delay(int milliseconds){
+    this_thread::sleep_for(chrono::milliseconds(milliseconds));
 }
 
 // -------------------------------------------------------------------------------- //
@@ -76,10 +78,12 @@ void random_int_pair_without_repetition(int *a, int *b, int min, int max){
     }
 }
 
-// -------------------------------------------------------------------------------- //
+double random_angle_in_radina(){
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dist(0.0, 2.0 * M_PI);
 
-void delay(int milliseconds){
-    this_thread::sleep_for(chrono::milliseconds(milliseconds));
+    return dist(gen);
 }
 
 // -------------------------------------------------------------------------------- //
@@ -87,15 +91,17 @@ void delay(int milliseconds){
 void create_folder_if_not_exist(const string &folderPath) {
     if (!filesystem::exists(folderPath)){
         if (std::filesystem::create_directory(folderPath)) {
-            printf("Utworzono folder: %s\n", folderPath.c_str());
+            pr_info("Utworzono folder: %s\n", folderPath.c_str());
         }
         else{
-            printf("Nie udało się utworzyć folderu: %s\n", folderPath.c_str());
+            pr_error("Nie udało się utworzyć folderu: %s\n", folderPath.c_str());
         }
     }
     else{
-        printf("Folder %s już istnieje\n", folderPath.c_str());
+        pr_debug("Folder %s już istnieje\n", folderPath.c_str());
     }
 }
 
 // -------------------------------------------------------------------------------- //
+
+

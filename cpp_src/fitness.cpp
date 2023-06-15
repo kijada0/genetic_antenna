@@ -13,6 +13,8 @@
 #include "nec_exception.h"
 #include "nec_radiation_pattern.h"
 
+#include "print.h"
+
 #include "fitness.h"
 #include "utils.h"
 #include "wire_geometry.h"
@@ -55,7 +57,7 @@ void create_and_fill_nec_geometry(nec_context *nec, wire_vector_t *wires, double
     for(int i = 0; i < TOTAL_WIRE_COUNT; i++){
         int segment_count = (int)((calculate_wire_length(&wires[i]) * WIRE_PER_WAVELENGTH)/calculate_wavelength(frequency)) + 1;
         if(segment_count < 1) segment_count = 1;
-        // printf("wire len: %f \t segments: %d\n", calculate_wire_length(&wires[i]), segment_count);
+        pr_junk("wire len: %f \t segments: %d", calculate_wire_length(&wires[i]), segment_count);
         geometry->wire(i, segment_count, wires[i].start.x, wires[i].start.y, wires[i].start.z,wires[i].end.x, wires[i].end.y, wires[i].end.z, WIRE_RADIUS, 1, 1);
     }
 
@@ -63,7 +65,7 @@ void create_and_fill_nec_geometry(nec_context *nec, wire_vector_t *wires, double
 }
 
 void setup_nec_cards(nec_context *nec, int freq){
-    // printf("Setting up NEC cards...\n");
+    pr_debug("Setting up NEC cards...");
     nec->gn_card(-1 ,0, 0, 0, 0, 0, 0, 0);
     nec->ex_card(EXCITATION_VOLTAGE, 0, 1, 0, 1, 0, 0, 0, 0, 0);
     nec->fr_card(0, 1, freq/1000000, 1);
@@ -71,7 +73,7 @@ void setup_nec_cards(nec_context *nec, int freq){
 }
 
 void setup_nec_cards_for_sweep(nec_context *nec, int middle_frequency, int frequency_step, int step_count){
-    // printf("Setting up NEC cards for speep ...\n");
+    pr_debug("Setting up NEC cards for sweep ...");
     double start_frequency = (double)middle_frequency - ((double)step_count/2 * frequency_step);
 
     nec->gn_card(-1 ,0, 0, 0, 0, 0, 0, 0);
@@ -112,7 +114,7 @@ double get_gamma_from_sweep(antenna_parameters_freq_sweep_t *parameters, int ind
 // -------------------------------------------------------------------------------- //
 
 void get_parameters_from_nec(nec_context *nec, antenna_parameters_t *parameters){
-    // printf("Getting parameters for middle frequency from nec->..\n");
+    pr_trash("Getting parameters for middle frequency from nec");
     parameters->gain.mean = nec->get_gain_mean(0);
     parameters->gain.max = nec->get_gain_max(0);
     parameters->gain.min = nec->get_gain_min(0);
@@ -136,7 +138,7 @@ void get_parameters_from_nec(nec_context *nec, antenna_parameters_t *parameters)
 }
 
 void get_parameters_of_frequency_sweep_from_nec(nec_context *nec, antenna_parameters_freq_sweep_t *parameters){
-    // printf("Get parameters of frequency sweep from NEC... \n");
+    pr_trash("Getting parameters of frequency sweep from nec");
     for(int i=0; i<MES_STEP_COUNT; i++) {
         parameters->impedance[i].imag = nec->get_impedance_imag(i);
         parameters->impedance[i].real = nec->get_impedance_real(i);
@@ -150,7 +152,7 @@ void get_parameters_of_frequency_sweep_from_nec(nec_context *nec, antenna_parame
 }
 
 void get_bandwidth_from_frequency_sweep(antenna_parameters_t *parameters, antenna_parameters_freq_sweep_t *freq_sweep_parameters){
-    //printf("Get bandwidth from frequency sweep... \n");
+    pr_trash("Get bandwidth from frequency sweep... ");
     int i, start_freq, current_freq;
 
     start_freq = FREQ - (MES_STEP_COUNT/2 * MES_FREQ_STEP);
@@ -181,6 +183,7 @@ void get_bandwidth_from_frequency_sweep(antenna_parameters_t *parameters, antenn
 // -------------------------------------------------------------------------------- //
 
 antenna_parameters_t calculate_antenna_parameters(antenna_geometry_t *geometry){
+    pr_trash("Calculating antenna parameters...");
     antenna_parameters_t parameters{};
     antenna_parameters_freq_sweep_t freq_sweep_parameters{};
 
@@ -202,7 +205,7 @@ antenna_parameters_t calculate_antenna_parameters(antenna_geometry_t *geometry){
     }
     catch (nec_exception* e) {
         //cout << e->get_message() << endl;
-        //printf("Error in NEC calculation!\n");
+        pr_debug("Error in NEC calculation!\n");
         parameters.error_flag = 1;
     }
 
@@ -212,9 +215,8 @@ antenna_parameters_t calculate_antenna_parameters(antenna_geometry_t *geometry){
 // -------------------------------------------------------------------------------- //
 
 int calculate_antenna_fitness(antenna_parameters_t *parameters){
+    pr_debug("Calculating antenna fitness...");
     int fitness = 0;
-    //printf("Fitness calculation...\n");
-    //printf("Error flag: %d\n", parameters->error_flag);
     if(parameters->error_flag == 1){
         fitness = -999999999;
         return fitness;
@@ -224,27 +226,28 @@ int calculate_antenna_fitness(antenna_parameters_t *parameters){
     int gain_fitness = parameters->gain.max * GAIN_WEIGHT;
     int gain_RHCP_fitness = parameters->RHCP_gain.max * GAIN_RHCP_WEIGHT;
     int gain_LHCP_fitness = parameters->LHCP_gain.max * GAIN_LHCP_WEIGHT;
-    //printf("Gain: %d \nRHCP %d \nLHCP %d \n", gain_fitness, gain_RHCP_fitness, gain_LHCP_fitness);
+    pr_junk("Gain: %d \nRHCP %d \nLHCP %d \n", gain_fitness, gain_RHCP_fitness, gain_LHCP_fitness);
 
     // SWR
     int VSWR_fitness = VSWR_WEIGHT - (abs(1 - parameters->SWR.VSWR) * VSWR_WEIGHT);
-    //printf("VSWR: %d\n", VSWR_fitness);
+    pr_junk("VSWR: %d\n", VSWR_fitness);
     int S11_fitness = -1 * parameters->SWR.S11 * S11_WEIGHT;
-    //printf("S11: %d\n", S11_fitness);
+    pr_junk("S11: %d\n", S11_fitness);
 
     // Bandwidth
     int bandwidth_fitness = parameters->band.bandwidth/1000000 * BANDWIDTH_WEIGHT;
-    //printf("Bandwidth: %d\n", bandwidth_fitness);
+    pr_junk("Bandwidth: %d\n", bandwidth_fitness);
 
     fitness = gain_fitness + gain_RHCP_fitness + gain_LHCP_fitness + VSWR_fitness + S11_fitness + bandwidth_fitness;
-    printf("Fitness: %d\n", fitness);
+    pr_debug("Fitness: %d\n", fitness);
+
     return fitness;
 }
 
 // -------------------------------------------------------------------------------- //
 
 void sort_antennas_by_fitness(antenna_t *population, int *ranking, int population_size){
-    printf("Sort antennas by fitness...\n");
+    pr_debug("Sort antennas by fitness...\n");
     int i, j, temp;
     for(i = 0; i < population_size; i++){
         ranking[i] = i;
@@ -261,7 +264,7 @@ void sort_antennas_by_fitness(antenna_t *population, int *ranking, int populatio
     }
 
     for(i = 0; i < population_size; i++){
-        printf("%d. antenna: %d  \t fittnes: %d\n", i, ranking[i], population[ranking[i]].fitness);
+        pr_junk("%d. antenna: %d  \t fitness: %d\n", i, ranking[i], population[ranking[i]].fitness);
     }
 }
 

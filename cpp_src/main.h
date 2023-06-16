@@ -19,9 +19,9 @@
 
 // ---------------------------------------- //
 // Population parameters //
-#define POPULATION_SIZE 512
+#define POPULATION_SIZE 256
 #define PARENT_COUNT 128
-#define MUTATION_RATE 0.08
+#define MUTATION_RATE 0.4
 
 // ---------------------------------------- //
 // System parameters //
@@ -31,14 +31,16 @@
 
 #ifdef WIN32
     #define OUTPUT_FILE_DIRECTORY "../out/"
+    #define TELEMETRY_FILE_DIRECTORY "../telemetry/"
 #else
     #define OUTPUT_FILE_DIRECTORY "/home/kijada/genetic/out/"
+    #define TELEMETRY_FILE_DIRECTORY "/home/kijada/genetic/telemetry/"
 #endif
 
 // ---------------------------------------- //
 
 #define SAVE_POPULATION_PERIOD 10
-#define TELEMETRY_RANGE 10
+#define TELEMETRY_RANGE 25
 
 // ---------------------------------------- //
 

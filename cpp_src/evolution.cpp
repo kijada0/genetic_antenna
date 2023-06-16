@@ -39,6 +39,7 @@ void create_generation_zero(antenna_t *population, int population_size){
 // -------------------------------------------------------------------------------- //
 
 void antenna_crossing_over(antenna_t *child, antenna_t *parent_A, antenna_t *parent_B){
+    pr_debug("Crossing over antennas...");
     wire_parameters_t *child_active_wire = child->geometry.active_elements;
     wire_parameters_t *child_ground_plane = child->geometry.ground_plane;
 
@@ -71,25 +72,26 @@ void antenna_crossing_over(antenna_t *child, antenna_t *parent_A, antenna_t *par
 }
 
 void antenna_mutation(antenna_t *child, double mutation_rate){
+    pr_debug("Mutating antenna...");
     wire_parameters_t *child_active_wire = child->geometry.active_elements;
     wire_parameters_t *child_ground_plane = child->geometry.ground_plane;
 
     double mutation_multiplier;
     for(int i = 0; i < WIRE_COUNT; i++){
-        mutation_multiplier = 1.0 + random_double_in_range(-1 * mutation_rate, mutation_rate);
+        mutation_multiplier = 1.0 + random_gaussian_double_in_range(-1 * mutation_rate, mutation_rate);
         child_active_wire[i].length *= mutation_multiplier;
 
-        mutation_multiplier = 1.0 + random_double_in_range(-1 * mutation_rate, mutation_rate);
+        mutation_multiplier = 1.0 + random_gaussian_double_in_range(-1 * mutation_rate, mutation_rate);
         child_active_wire[i].angle_xy *= mutation_multiplier;
 
-        mutation_multiplier = 1.0 + random_double_in_range(-1 * mutation_rate, mutation_rate);
+        mutation_multiplier = 1.0 + random_gaussian_double_in_range(-1 * mutation_rate, mutation_rate);
         child_active_wire[i].angle_xz *= mutation_multiplier;
     }
 
-    mutation_multiplier = 1.0 + random_double_in_range(-1 * mutation_rate, mutation_rate);
+    mutation_multiplier = 1.0 + random_gaussian_double_in_range(-1 * mutation_rate, mutation_rate);
     child_ground_plane[0].length *= mutation_multiplier;
 
-    mutation_multiplier = 1.0 + random_double_in_range(-1 * mutation_rate, mutation_rate);
+    mutation_multiplier = 1.0 + random_gaussian_double_in_range(-1 * mutation_rate, mutation_rate);
     child_ground_plane[0].angle_xz *= mutation_multiplier;
 
     for(int i = 1; i < GROUND_PLANE_ELEMENT_COUNT; i++) {
@@ -102,16 +104,17 @@ void antenna_mutation(antenna_t *child, double mutation_rate){
 // -------------------------------------------------------------------------------- //
 
 void create_next_generation(antenna_t *population, antenna_t *parents, int *ranking, int population_size, int parent_count){
-    pr_info("Creating next generation");
+    pr_info("Creating next generation...");
     antenna_t new_population[population_size];
     inti_population(&new_population[0], population_size);
     for(int i = 0; i < population_size; i++){
         int parent_A_ranking_index, parent_B_ranking_index;
-        random_int_pair_without_repetition(&parent_A_ranking_index, &parent_B_ranking_index, 0, parent_count-1);
+        //random_int_pair_without_repetition(&parent_A_ranking_index, &parent_B_ranking_index, 0, parent_count-1);
+        random_int_pair_without_repetition_nonlinear_distribution(&parent_A_ranking_index, &parent_B_ranking_index, 0, parent_count - 1);
 
         int parent_A_index = ranking[parent_A_ranking_index];
         int parent_B_index = ranking[parent_B_ranking_index];
-        pr_debug("Parent A: %d (%d), Parent B: %d(%d) \n", parent_A_index, parent_A_ranking_index, parent_B_index, parent_B_ranking_index);
+        pr_debug("Parent A: %d (%d), Parent B: %d(%d)", parent_A_index, parent_A_ranking_index, parent_B_index, parent_B_ranking_index);
 
         antenna_crossing_over(&new_population[i], &parents[parent_A_index], &parents[parent_B_index]);
         antenna_mutation(&new_population[i], MUTATION_RATE);
@@ -173,8 +176,8 @@ void save_sorted_population_to_file(antenna_t *population, int *ranking, int pop
 // -------------------------------------------------------------------------------- //
 
 void save_telemetry(antenna_t *population, int *ranking, int population_size, int generation_number, int range, double generation_duration){
-    create_folder_if_not_exist(string(OUTPUT_FILE_DIRECTORY));
-    string file_path = string(OUTPUT_FILE_DIRECTORY) + "telemetry.csv";
+    create_folder_if_not_exist(string(TELEMETRY_FILE_DIRECTORY));
+    string file_path = string(TELEMETRY_FILE_DIRECTORY) + "telemetry.csv";
 
     FILE *file = fopen(file_path.c_str(), "a");
 

@@ -69,13 +69,61 @@ double random_double_in_range(double min, double max){
     return dist(gen);
 }
 
+double random_gaussian_double_in_range(double min, double max){
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::normal_distribution<double> dist(min, max);
+
+    return dist(gen);
+}
+
+double random_lognormal_double_in_range(double min, double max){
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::lognormal_distribution<double> dist(min, max);
+
+    return dist(gen);
+}
+
+double random_exponential_double_in_range(double min, double max) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::exponential_distribution<double> dist(1.0 / (max - min));
+
+    return dist(gen) + min;
+}
+
+double random_chi_squared_double_in_range(double min, double max) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::chi_squared_distribution<double> dist(min);
+
+    return dist(gen) * (max - min) + min;
+}
+
+
 void random_int_pair_without_repetition(int *a, int *b, int min, int max){
+    pr_debug("Random int pair without repetition...");
     *a = random_int_in_range(min, max);
     *b = random_int_in_range(min, max);
 
     while(*a == *b){
         *b = random_int_in_range(min, max);
     }
+}
+
+void random_int_pair_without_repetition_nonlinear_distribution(int *a, int *b, int min, int max){
+    pr_debug("Random int pair without repetition non linear distribution...");
+    int a0 = (int)random_exponential_double_in_range(min, max);
+    int b0 = (int)random_chi_squared_double_in_range(min, max);
+    pr_debug("a0: %d, b0: %d", a0, b0);
+
+    while(a0 == b0){
+        b0 = (int)random_chi_squared_double_in_range(min, max);
+    }
+
+    *a = a0;
+    *b = b0;
 }
 
 double random_angle_in_radina(){
@@ -91,14 +139,14 @@ double random_angle_in_radina(){
 void create_folder_if_not_exist(const string &folderPath) {
     if (!filesystem::exists(folderPath)){
         if (std::filesystem::create_directory(folderPath)) {
-            pr_info("Utworzono folder: %s\n", folderPath.c_str());
+            pr_info("Utworzono folder: %s", folderPath.c_str());
         }
         else{
-            pr_error("Nie udało się utworzyć folderu: %s\n", folderPath.c_str());
+            pr_error("Nie udało się utworzyć folderu: %s", folderPath.c_str());
         }
     }
     else{
-        pr_debug("Folder %s już istnieje\n", folderPath.c_str());
+        pr_debug("Folder %s już istnieje", folderPath.c_str());
     }
 }
 

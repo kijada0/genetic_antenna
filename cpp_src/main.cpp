@@ -54,6 +54,8 @@ void distributes_computations_across_threads(antenna_t *population) {
         index_of_first_individual_in_current_sub_population += number_of_individuals_for_thread;
     }
 
+    pr_info("Waiting for threads to finish...");
+
     for (i = 0; i < MAX_THREAD_COUNT; i++) {
         threads[i].join();
     }

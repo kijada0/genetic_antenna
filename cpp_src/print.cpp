@@ -9,7 +9,7 @@
 
 using namespace std;
 
-int print_level = 3;
+int print_level = 4;
 
 const char* get_current_time() {
     struct timeval tmnow{};

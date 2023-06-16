@@ -239,7 +239,7 @@ int calculate_antenna_fitness(antenna_parameters_t *parameters){
     pr_junk("Bandwidth: %d\n", bandwidth_fitness);
 
     fitness = gain_fitness + gain_RHCP_fitness + gain_LHCP_fitness + VSWR_fitness + S11_fitness + bandwidth_fitness;
-    pr_debug("Fitness: %d\n", fitness);
+    pr_trash("Fitness: %d\n", fitness);
 
     return fitness;
 }
@@ -247,7 +247,7 @@ int calculate_antenna_fitness(antenna_parameters_t *parameters){
 // -------------------------------------------------------------------------------- //
 
 void sort_antennas_by_fitness(antenna_t *population, int *ranking, int population_size){
-    pr_debug("Sort antennas by fitness...\n");
+    pr_debug("Sort antennas by fitness...");
     int i, j, temp;
     for(i = 0; i < population_size; i++){
         ranking[i] = i;

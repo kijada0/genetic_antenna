@@ -67,6 +67,7 @@ struct antenna_parameters_t{
     antenna_SWR_t SWR;
     antenna_band_t band;
     int error_flag;
+    int death_flag;
 };
 
 struct antenna_t{

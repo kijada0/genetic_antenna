@@ -18,9 +18,9 @@ void delay(int milliseconds);
 
 int random_int_in_range(int min, int max);
 double random_double_in_range(double min, double max);
-double random_gaussian_double_in_range(double min, double max);
+double random_normal_double_in_range(double min, double max);
+double random_half_normal_double_in_range(double min, double max);
 double random_lognormal_double_in_range(double min, double max);
-double random_exponential_double_in_range(double min, double max);
 double random_chi_squared_double_in_range(double min, double max);
 
 void random_int_pair_without_repetition(int *a, int *b, int min, int max);

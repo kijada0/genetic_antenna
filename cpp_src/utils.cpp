@@ -69,36 +69,80 @@ double random_double_in_range(double min, double max){
     return dist(gen);
 }
 
-double random_gaussian_double_in_range(double min, double max){
+double random_normal_double_in_range(double min, double max){
+    double mean = (max + min) / 2;
+    double std = (max - mean)/2 * sqrt(2)/2;
+
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::normal_distribution<double> dist(min, max);
+    std::normal_distribution<double> dist(mean, std);
 
+    int i = 0;
+    while(i < 100){
+        double val = dist(gen);
+        if(val >= min && val <= max){
+            return val;
+        }
+        i++;
+    }
     return dist(gen);
 }
 
-double random_lognormal_double_in_range(double min, double max){
+double random_half_normal_double_in_range(double min, double max){
+    double min0 = min - (max - min);
+    double mean = (max + min0) / 2;
+    double std = (max - mean)/2 * sqrt(2)/2;
+
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::lognormal_distribution<double> dist(min, max);
+    std::normal_distribution<double> dist(mean, std);
 
+    int i = 0;
+    while(i < 100){
+        double val = dist(gen);
+        if(val >= min && val <= max){
+            return val;
+        }
+        i++;
+    }
     return dist(gen);
 }
 
-double random_exponential_double_in_range(double min, double max) {
+
+double random_lognormal_double_in_range(double min, double max) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::exponential_distribution<double> dist(1.0 / (max - min));
+    std::lognormal_distribution<double> dist(1, 1);
 
-    return dist(gen) + min;
+    int i = 0;
+    while (i < 100) {
+        double val = dist(gen);
+        if (val >= 0 && val <= 25) {
+            double scaled_val = val / 25;
+            double mapped_val = scaled_val * (max - min) + min;
+            return mapped_val;
+        }
+        i++;
+    }
+    return dist(gen);
 }
 
 double random_chi_squared_double_in_range(double min, double max) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::chi_squared_distribution<double> dist(min);
+    std::chi_squared_distribution<double> dist(10);
 
-    return dist(gen) * (max - min) + min;
+    int i = 0;
+    while (i < 100) {
+        double val = dist(gen);
+        if (val >= 0 && val <= 25) {
+            double scaled_val = val / 25;
+            double mapped_val = scaled_val * (max - min) + min;
+            return mapped_val;
+        }
+        i++;
+    }
+    return dist(gen);
 }
 
 
@@ -114,7 +158,7 @@ void random_int_pair_without_repetition(int *a, int *b, int min, int max){
 
 void random_int_pair_without_repetition_nonlinear_distribution(int *a, int *b, int min, int max){
     pr_debug("Random int pair without repetition non linear distribution...");
-    int a0 = (int)random_exponential_double_in_range(min, max);
+    int a0 = (int)random_half_normal_double_in_range(min, max);
     int b0 = (int)random_chi_squared_double_in_range(min, max);
     pr_debug("a0: %d, b0: %d", a0, b0);
 

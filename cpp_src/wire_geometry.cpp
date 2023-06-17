@@ -130,8 +130,53 @@ bool check_if_geometry_fits_in_cube(antenna_geometry_t *geometry, double cube_ed
         }
     }
 
+    for(int i = 0; i < GROUND_PLANE_ELEMENT_COUNT; i++){
+        if(temp_geometry.geometry[i + WIRE_COUNT].end.x > cube_edge_length / 2 || temp_geometry.geometry[i + WIRE_COUNT].end.x < -cube_edge_length / 2){
+            return false;
+        }
+        if(temp_geometry.geometry[i + WIRE_COUNT].end.y > cube_edge_length / 2 || temp_geometry.geometry[i + WIRE_COUNT].end.y < -cube_edge_length / 2){
+            return false;
+        }
+        if(temp_geometry.geometry[i + WIRE_COUNT].end.z > cube_edge_length || temp_geometry.geometry[i + WIRE_COUNT].end.z < -1*cube_edge_length){
+            return false;
+        }
+    }
+
     return true;
 }
+
+bool check_if_geometry_fits_in_cylinder(antenna_geometry_t *geometry, double cylinder_radius, double cylinder_height){
+    pr_trash("Checking if geometry fits in cube...");
+    antenna_geometry_t temp_geometry{};
+    memcpy(&temp_geometry, geometry, sizeof(antenna_geometry_t));
+
+    calculate_wire_geometry(&temp_geometry);
+
+    for(int i = 0; i < WIRE_COUNT; i++){
+        double radius = sqrt(pow(temp_geometry.geometry[i].end.x, 2) + pow(temp_geometry.geometry[i].end.y, 2));
+        if(radius > cylinder_radius / 2){
+            return false;
+        }
+
+        if(temp_geometry.geometry[i].end.z > cylinder_height || temp_geometry.geometry[i].end.z < 0){
+            return false;
+        }
+    }
+
+    for(int i = 0; i < GROUND_PLANE_ELEMENT_COUNT; i++){
+        double radius = sqrt(pow(temp_geometry.geometry[i + WIRE_COUNT].end.x, 2) + pow(temp_geometry.geometry[i + WIRE_COUNT].end.y, 2));
+        if(radius > cylinder_radius / 2){
+            return false;
+        }
+
+        if(temp_geometry.geometry[i + WIRE_COUNT].end.z > cylinder_height || temp_geometry.geometry[i + WIRE_COUNT].end.z < -1*cylinder_height){
+            return false;
+        }
+    }
+
+    return true;
+}
+
 
 // -------------------------------------------------------------------------------- //
 

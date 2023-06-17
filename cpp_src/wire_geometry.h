@@ -39,6 +39,8 @@ struct antenna_geometry_t{
 // -------------------------------------------------------------------------------- //
 
 bool check_if_geometry_fits_in_cube(antenna_geometry_t *geometry, double cube_edge_length);
+bool check_if_geometry_fits_in_cylinder(antenna_geometry_t *geometry, double cylinder_radius, double cylinder_height);
+
 antenna_geometry_t generate_random_antenna();
 void calculate_wire_geometry(antenna_geometry_t *geometry);
 

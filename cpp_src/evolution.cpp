@@ -78,20 +78,20 @@ void antenna_mutation(antenna_t *child, double mutation_rate){
 
     double mutation_multiplier;
     for(int i = 0; i < WIRE_COUNT; i++){
-        mutation_multiplier = 1.0 + random_gaussian_double_in_range(-1 * mutation_rate, mutation_rate);
+        mutation_multiplier = 1.0 + random_normal_double_in_range(-1 * mutation_rate, mutation_rate);
         child_active_wire[i].length *= mutation_multiplier;
 
-        mutation_multiplier = 1.0 + random_gaussian_double_in_range(-1 * mutation_rate, mutation_rate);
+        mutation_multiplier = 1.0 + random_normal_double_in_range(-1 * mutation_rate, mutation_rate);
         child_active_wire[i].angle_xy *= mutation_multiplier;
 
-        mutation_multiplier = 1.0 + random_gaussian_double_in_range(-1 * mutation_rate, mutation_rate);
+        mutation_multiplier = 1.0 + random_normal_double_in_range(-1 * mutation_rate, mutation_rate);
         child_active_wire[i].angle_xz *= mutation_multiplier;
     }
 
-    mutation_multiplier = 1.0 + random_gaussian_double_in_range(-1 * mutation_rate, mutation_rate);
+    mutation_multiplier = 1.0 + random_normal_double_in_range(-1 * mutation_rate, mutation_rate);
     child_ground_plane[0].length *= mutation_multiplier;
 
-    mutation_multiplier = 1.0 + random_gaussian_double_in_range(-1 * mutation_rate, mutation_rate);
+    mutation_multiplier = 1.0 + random_normal_double_in_range(-1 * mutation_rate, mutation_rate);
     child_ground_plane[0].angle_xz *= mutation_multiplier;
 
     for(int i = 1; i < GROUND_PLANE_ELEMENT_COUNT; i++) {

@@ -24,10 +24,6 @@ int cycle_count = 0;
 
 void process_antenna(int individual_number, antenna_t *sub_population, int process_id) {
     for(int i = 0; i < individual_number; i++) {
-        //delay(1000*process_id);
-        string file_name = "out/geometry_" + to_string(i) + "_" + to_string(cycle_count) + + "_" + to_string(process_id) + ".txt";
-        //save_geometry_to_file(&sub_population[i].geometry, file_name);
-        //print_antenna_wires_parameters(&sub_population[i].geometry);
         sub_population[i].parameters = calculate_antenna_parameters(&sub_population[i].geometry);
         sub_population[i].fitness = calculate_antenna_fitness(&sub_population[i].parameters);
     }

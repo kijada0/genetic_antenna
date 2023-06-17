@@ -198,8 +198,8 @@ antenna_parameters_t calculate_antenna_parameters(antenna_geometry_t *geometry){
     antenna_parameters_freq_sweep_t freq_sweep_parameters{};
 
     if (!antenna_geometry_is_correct(geometry)){
-        pr_trash("Antenna geometry is not correct!");
-        printf("Antenna geometry is not correct!\n");
+        //pr_trash("Antenna geometry is not correct!");
+        //printf("Antenna geometry is not correct!\n");
         parameters.death_flag = true;
         return parameters;
     }

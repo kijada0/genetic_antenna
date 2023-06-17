@@ -154,6 +154,7 @@ bool check_if_geometry_fits_in_cylinder(antenna_geometry_t *geometry, double cyl
 
     for(int i = 0; i < WIRE_COUNT; i++){
         double radius = sqrt(pow(temp_geometry.geometry[i].end.x, 2) + pow(temp_geometry.geometry[i].end.y, 2));
+        printf("radius: %f\n", radius, cylinder_radius / 2);
         if(radius > cylinder_radius / 2){
             return false;
         }

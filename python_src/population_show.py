@@ -5,8 +5,10 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 source_file = "population_230617_053924392.csv"
+source_file = "D:\Studia\CDV\Semetr2\Sztuczna Inteligencja\projekt_zaliczeniowy\genetic_antenna\cpp_src\out\population_230618_221042087.csv"
 
-antenna_count = 10
+
+antenna_count = 1
 
 
 def main():
@@ -49,9 +51,9 @@ def show_geometry(geometry, id):
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
 
-    ax.set_xlim(-0.5, 0.5)
-    ax.set_ylim(-0.5, 0.5)
-    ax.set_zlim(0, 1)
+    ax.set_xlim(-0.3, 0.3)
+    ax.set_ylim(-0.3, 0.3)
+    ax.set_zlim(-0.5, 0.5)
 
     color_list = ["r", "g", "b", "y", "c", "m", "k", "r", "g", "b", "y", "c", "m", "k", "w"]
 

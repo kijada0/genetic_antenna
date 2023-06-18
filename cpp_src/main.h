@@ -11,19 +11,20 @@
 #define WIRE_COUNT 4
 #define GROUND_PLANE_ELEMENT_COUNT 4
 #define TOTAL_WIRE_COUNT (WIRE_COUNT+GROUND_PLANE_ELEMENT_COUNT)
+
 #define CUBE_EDGE_LENGTH_RELATIVE_TO_WAVELENGTH 0.5
 #define CYLINDER_RADIUS_RELATIVE_TO_WAVELENGTH 0.5
 #define CYLINDER_HEIGHT_RELATIVE_TO_WAVELENGTH 0.5
 
 // ---------------------------------------- //
 // Target parameters //
-#define FREQ 433000000
+#define FREQ 144000000
 
 // ---------------------------------------- //
 // Population parameters //
 #define POPULATION_SIZE 256
-#define PARENT_COUNT 128
-#define MUTATION_RATE 0.33
+#define PARENT_COUNT 192
+#define MUTATION_RATE 0.25
 
 // ---------------------------------------- //
 // System parameters //
@@ -41,11 +42,10 @@
 
 // ---------------------------------------- //
 
-#define SAVE_POPULATION_PERIOD 10
-#define TELEMETRY_RANGE 25
+#define SAVE_POPULATION_PERIOD 5
+#define TELEMETRY_RANGE 10
 
 // ---------------------------------------- //
-
 
 
 

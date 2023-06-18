@@ -8,7 +8,7 @@
 
 #define WIRE_RADIUS 0.003           // 3mm in meters
 #define WIRE_PER_WAVELENGTH 128     // number of wires per wavelength
-#define WIRE_SEGMENT_COUNT 12       // number of segments of wire
+#define WIRE_SEGMENT_COUNT 4      // number of segments of wire
 
 #define MES_FREQ_STEP 500000        // 500kHz
 #define MES_BANDWIDTH 25000000      // 25MHz

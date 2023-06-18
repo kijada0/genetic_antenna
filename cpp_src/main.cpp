@@ -24,7 +24,11 @@ int cycle_count = 0;
 
 void process_antenna(int individual_number, antenna_t *sub_population, int process_id) {
     for(int i = 0; i < individual_number; i++) {
+        string file_name = "out/geometry_" + to_string(i) + "_" + to_string(cycle_count) + + "_" + to_string(process_id) + ".txt";
+        //print_antenna_wires_parameters(&sub_population[i].geometry);
+        //print_antenna_geometry(&sub_population[i].geometry);
         sub_population[i].parameters = calculate_antenna_parameters(&sub_population[i].geometry);
+        //print_antenna_parameters(&sub_population[i].parameters);
         sub_population[i].fitness = calculate_antenna_fitness(&sub_population[i].parameters);
     }
 }
@@ -59,12 +63,13 @@ void distributes_computations_across_threads(antenna_t *population) {
 
 // -------------------------------------------------------------------------------- //
 
-void save_what_is_to_be_saved(antenna_t *population, int *ranking, int size, int cycle_count, double population_time) {
-    save_telemetry(population, ranking, size, cycle_count, TELEMETRY_RANGE, population_time);
-    if(cycle_count % SAVE_POPULATION_PERIOD == 0){
+void save_what_is_to_be_saved(antenna_t *population, int *ranking, int size, int cycle_number, double population_time) {
+    pr_debug("Saving what is to be saved...");
+    save_telemetry(population, ranking, size, cycle_number, TELEMETRY_RANGE, population_time);
+    if(cycle_number % SAVE_POPULATION_PERIOD == 0){
         save_sorted_population_to_file(&population[0], &ranking[0], size);
     }
-    pr_info("Cycle %d calculation time: %.3f", cycle_count, population_time);
+    pr_info("Cycle %d calculation time: %.3f", cycle_number, population_time);
 }
 
 // -------------------------------------------------------------------------------- //
@@ -94,7 +99,7 @@ int main() {
 
     create_generation_zero(&population[0], POPULATION_SIZE);
 
-    while(get_duration_in_s(start) < 16*60*60){
+    while(get_duration_in_s(start) < (24*60*60) && cycle_count < 10000){
         auto time0 = high_resolution_clock::now();
         distributes_computations_across_threads(&population[0]);
         sort_antennas_by_fitness(&population[0], &ranking[0], POPULATION_SIZE);
@@ -105,10 +110,13 @@ int main() {
     }
 
     printf("----------------------------------------\n");
+    printf("Evolution finished.\n");
+    printf("----------------------------------------\n");
+    printf("Generation count: %d\n", cycle_count);
 
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
-    printf("Time taken by function: %.3f", (double)duration.count()/1000000);
+    printf("Time taken by function: %.3f\n", (double)duration.count()/1000000);
 
     return 0;
 }

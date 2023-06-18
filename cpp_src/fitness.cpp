@@ -56,8 +56,10 @@ void create_and_fill_nec_geometry(nec_context *nec, wire_vector_t *wires, double
 
     for(int i = 0; i < TOTAL_WIRE_COUNT; i++){
         int segment_count = (int)((calculate_wire_length(&wires[i]) * WIRE_PER_WAVELENGTH)/calculate_wavelength(frequency)) + 1;
+        segment_count = calculate_wire_length(&wires[i]) > 0.2 ? segment_count : WIRE_SEGMENT_COUNT;
         if(segment_count < 1) segment_count = 1;
         pr_junk("wire len: %f \t segments: %d", calculate_wire_length(&wires[i]), segment_count);
+        //printf("wire len: %f \t segments: %d \n", calculate_wire_length(&wires[i]), segment_count);
         geometry->wire(i, segment_count, wires[i].start.x, wires[i].start.y, wires[i].start.z,wires[i].end.x, wires[i].end.y, wires[i].end.z, WIRE_RADIUS, 1, 1);
     }
 
@@ -182,7 +184,7 @@ void get_bandwidth_from_frequency_sweep(antenna_parameters_t *parameters, antenn
 
 // -------------------------------------------------------------------------------- //
 
-bool antenna_geometry_is_correct(antenna_geometry_t *antenna_geometry){
+int antenna_geometry_is_correct(antenna_geometry_t *antenna_geometry){
     double wavelength = calculate_wavelength(FREQ);
     double radius = wavelength*CYLINDER_RADIUS_RELATIVE_TO_WAVELENGTH;
     double height = wavelength*CYLINDER_HEIGHT_RELATIVE_TO_WAVELENGTH;
@@ -197,11 +199,13 @@ antenna_parameters_t calculate_antenna_parameters(antenna_geometry_t *geometry){
     antenna_parameters_t parameters{};
     antenna_parameters_freq_sweep_t freq_sweep_parameters{};
 
-    if (!antenna_geometry_is_correct(geometry)){
-        //pr_trash("Antenna geometry is not correct!");
-        //printf("Antenna geometry is not correct!\n");
-        parameters.death_flag = true;
+    if(antenna_geometry_is_correct(geometry) != 0){
+        // printf("Antenna geometry is not correct! \n");
+        parameters.death_flag = -1;
         return parameters;
+    }
+    else{
+        parameters.death_flag = 0;
     }
 
     try {
@@ -218,12 +222,12 @@ antenna_parameters_t calculate_antenna_parameters(antenna_geometry_t *geometry){
         get_parameters_of_frequency_sweep_from_nec(&nec, &freq_sweep_parameters);
         get_bandwidth_from_frequency_sweep(&parameters, &freq_sweep_parameters);
 
-        parameters.error_flag = false;
+        parameters.error_flag = 0;
     }
     catch (nec_exception* e) {
         //cout << e->get_message() << endl;
         pr_trash("Error in NEC calculation!\n");
-        parameters.error_flag = true;
+        parameters.error_flag = -1;
     }
 
     return parameters;
@@ -234,8 +238,14 @@ antenna_parameters_t calculate_antenna_parameters(antenna_geometry_t *geometry){
 int calculate_antenna_fitness(antenna_parameters_t *parameters){
     pr_trash("Calculating antenna fitness...");
     int fitness = 0;
-    if(parameters->error_flag == true|| parameters->death_flag == true){
-        fitness = -999999999;
+
+    if(parameters->error_flag != 0){
+        fitness = -799999999;
+        return fitness;
+    }
+
+    if(parameters->death_flag != 0){
+        fitness = -899999999;
         return fitness;
     }
 
@@ -313,6 +323,7 @@ void clear_antenna_parameters(antenna_parameters_t *parameters){
     parameters->band.bandwidth = 0;
 
     parameters->error_flag = 0;
+    parameters->death_flag = 0;
 }
 
 // -------------------------------------------------------------------------------- //

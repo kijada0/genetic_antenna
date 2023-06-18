@@ -94,9 +94,9 @@ void calculate_wire_geometry_of_active_elements(antenna_geometry_t *geometry){
 void calculate_wire_geometry_of_ground_plane(antenna_geometry_t *geometry){
     pr_junk("Calculating wire geometry of ground plane...");
     for(int i = 0; i < GROUND_PLANE_ELEMENT_COUNT; i++){
-        geometry->geometry[i + WIRE_COUNT].start.x = 0;
-        geometry->geometry[i + WIRE_COUNT].start.y = 0;
-        geometry->geometry[i + WIRE_COUNT].start.z = 0;
+        geometry->geometry[i + WIRE_COUNT].start.x = 0.0;
+        geometry->geometry[i + WIRE_COUNT].start.y = 0.0;
+        geometry->geometry[i + WIRE_COUNT].start.z = 0.0;
 
         geometry->geometry[i + WIRE_COUNT].end.x = geometry->ground_plane[i].length * cos(geometry->ground_plane[i].angle_xy) * cos(geometry->ground_plane[i].angle_xz);
         geometry->geometry[i + WIRE_COUNT].end.y = geometry->ground_plane[i].length * sin(geometry->ground_plane[i].angle_xy) * cos(geometry->ground_plane[i].angle_xz);
@@ -111,7 +111,7 @@ void calculate_wire_geometry(antenna_geometry_t *geometry){
 
 // -------------------------------------------------------------------------------- //
 
-bool check_if_geometry_fits_in_cube(antenna_geometry_t *geometry, double cube_edge_length){
+int check_if_geometry_fits_in_cube(antenna_geometry_t *geometry, double cube_edge_length){
     pr_trash("Checking if geometry fits in cube...");
     antenna_geometry_t temp_geometry{};
     memcpy(&temp_geometry, geometry, sizeof(antenna_geometry_t));
@@ -120,32 +120,32 @@ bool check_if_geometry_fits_in_cube(antenna_geometry_t *geometry, double cube_ed
 
     for(int i = 0; i < WIRE_COUNT; i++){
         if(temp_geometry.geometry[i].end.x > cube_edge_length / 2 || temp_geometry.geometry[i].end.x < -cube_edge_length / 2){
-            return false;
+            return -1;
         }
         if(temp_geometry.geometry[i].end.y > cube_edge_length / 2 || temp_geometry.geometry[i].end.y < -cube_edge_length / 2){
-            return false;
+            return -1;
         }
         if(temp_geometry.geometry[i].end.z > cube_edge_length || temp_geometry.geometry[i].end.z < 0){
-            return false;
+            return -1;
         }
     }
 
     for(int i = 0; i < GROUND_PLANE_ELEMENT_COUNT; i++){
         if(temp_geometry.geometry[i + WIRE_COUNT].end.x > cube_edge_length / 2 || temp_geometry.geometry[i + WIRE_COUNT].end.x < -cube_edge_length / 2){
-            return false;
+            return -1;
         }
         if(temp_geometry.geometry[i + WIRE_COUNT].end.y > cube_edge_length / 2 || temp_geometry.geometry[i + WIRE_COUNT].end.y < -cube_edge_length / 2){
-            return false;
+            return -1;
         }
         if(temp_geometry.geometry[i + WIRE_COUNT].end.z > cube_edge_length || temp_geometry.geometry[i + WIRE_COUNT].end.z < -1*cube_edge_length){
-            return false;
+            return -1;
         }
     }
 
-    return true;
+    return 0;
 }
 
-bool check_if_geometry_fits_in_cylinder(antenna_geometry_t *geometry, double cylinder_radius, double cylinder_height){
+int check_if_geometry_fits_in_cylinder(antenna_geometry_t *geometry, double cylinder_radius, double cylinder_height){
     pr_trash("Checking if geometry fits in cube...");
     antenna_geometry_t temp_geometry{};
     memcpy(&temp_geometry, geometry, sizeof(antenna_geometry_t));
@@ -154,30 +154,33 @@ bool check_if_geometry_fits_in_cylinder(antenna_geometry_t *geometry, double cyl
 
     for(int i = 0; i < WIRE_COUNT; i++){
         double radius = sqrt(pow(temp_geometry.geometry[i].end.x, 2) + pow(temp_geometry.geometry[i].end.y, 2));
-        printf("radius: %f\n", radius, cylinder_radius / 2);
         if(radius > cylinder_radius / 2){
-            return false;
+            //printf("radius: %f \t %f \n", radius, cylinder_radius / 2);
+            return -1;
         }
 
-        if(temp_geometry.geometry[i].end.z > cylinder_height || temp_geometry.geometry[i].end.z < 0){
-            return false;
+        if(temp_geometry.geometry[i].end.z > cylinder_height && temp_geometry.geometry[i].end.z < 0){
+            //printf("z: %f \t %f \n", temp_geometry.geometry[i].end.z, cylinder_height);
+            return -1;
         }
     }
 
     for(int i = 0; i < GROUND_PLANE_ELEMENT_COUNT; i++){
         double radius = sqrt(pow(temp_geometry.geometry[i + WIRE_COUNT].end.x, 2) + pow(temp_geometry.geometry[i + WIRE_COUNT].end.y, 2));
         if(radius > cylinder_radius / 2){
-            return false;
+            //printf("radius: %f \t %f \n", radius, cylinder_radius / 2);
+            return -1;
         }
 
-        if(temp_geometry.geometry[i + WIRE_COUNT].end.z > cylinder_height || temp_geometry.geometry[i + WIRE_COUNT].end.z < -1*cylinder_height){
-            return false;
+        if(temp_geometry.geometry[i + WIRE_COUNT].end.z > cylinder_height && temp_geometry.geometry[i + WIRE_COUNT].end.z < -1*cylinder_height){
+            //printf("z: %f \t %f \n", temp_geometry.geometry[i + WIRE_COUNT].end.z, cylinder_height);
+            return -1;
         }
+        //printf("radius: %f \t %f \n", radius, cylinder_radius / 2);
     }
 
-    return true;
+    return 0;
 }
-
 
 // -------------------------------------------------------------------------------- //
 
@@ -219,7 +222,7 @@ void generate_test_dipol(antenna_geometry_t *geometry){
 
     for(int i = 0; i < WIRE_COUNT; i++){
         geometry->active_elements[i].length = segments_lengths;
-        geometry->active_elements[i].angle_xy = 0;
+        geometry->active_elements[i].angle_xy = 0.0;
         geometry->active_elements[i].angle_xz = M_PI / 2;
     }
 }
@@ -230,6 +233,9 @@ void generate_random_ground_plane(antenna_geometry_t *geometry){
     double segments_lengths = random_double_in_range(wavelength/8, wavelength/2);
     double segments_angles_xy = 2 * M_PI / GROUND_PLANE_ELEMENT_COUNT;
     double segments_angles_xz = random_angle_in_radina();
+
+    // segments_lengths = wavelength * 0.28 * 0.9;
+    // segments_angles_xz = (2*M_PI/8)*7;
 
     for(int i = 0; i < GROUND_PLANE_ELEMENT_COUNT; i++){
         geometry->ground_plane[i].length = segments_lengths;
@@ -284,24 +290,24 @@ void clear_antenna_geometry(antenna_geometry_t *geometry){
     pr_trash("Clearing antenna geometry...");
     int i;
     for(i = 0; i < TOTAL_WIRE_COUNT; i++){
-        geometry->geometry[i].start.x = 0;
-        geometry->geometry[i].start.y = 0;
-        geometry->geometry[i].start.z = 0;
-        geometry->geometry[i].end.x = 0;
-        geometry->geometry[i].end.y = 0;
-        geometry->geometry[i].end.z = 0;
+        geometry->geometry[i].start.x = 0.0;
+        geometry->geometry[i].start.y = 0.0;
+        geometry->geometry[i].start.z = 0.0;
+        geometry->geometry[i].end.x = 0.0;
+        geometry->geometry[i].end.y = 0.0;
+        geometry->geometry[i].end.z = 0.0;
     }
 
     for(i = 0; i< WIRE_COUNT; i++){
-        geometry->active_elements[i].length = 0;
-        geometry->active_elements[i].angle_xy = 0;
-        geometry->active_elements[i].angle_xz = 0;
+        geometry->active_elements[i].length = 0.0;
+        geometry->active_elements[i].angle_xy = 0.0;
+        geometry->active_elements[i].angle_xz = 0.0;
     }
 
     for(i = 0; i< GROUND_PLANE_ELEMENT_COUNT; i++){
-        geometry->ground_plane[i].length = 0;
-        geometry->ground_plane[i].angle_xy = 0;
-        geometry->ground_plane[i].angle_xz = 0;
+        geometry->ground_plane[i].length = 0.0;
+        geometry->ground_plane[i].angle_xy = 0.0;
+        geometry->ground_plane[i].angle_xz = 0.0;
     }
 }
 

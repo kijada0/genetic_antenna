@@ -9,12 +9,13 @@
 
 using namespace std;
 
-int print_level = 3;
+int print_level = 4;
 
 const char* get_current_time() {
     struct timeval tmnow{};
     gettimeofday(&tmnow, nullptr);
-    struct tm* tm = localtime(&tmnow.tv_sec);
+    time_t rawtime = tmnow.tv_sec;
+    struct tm* tm = localtime(&rawtime);
 
     char time_buf[30];
     char usec_buf[10];
@@ -54,7 +55,8 @@ void print(int level, const char *format, ...)
         ret = stat(log_file_path, &st);
 
         gettimeofday(&tmnow, nullptr);
-        tm = localtime(&tmnow.tv_sec);
+        time_t rawtime = tmnow.tv_sec;
+        tm = localtime(&rawtime);
         strftime(time_buf, 30, "%Y.%m.%d %H:%M:%S.", tm);
         snprintf(usec_buf, 10, "%03d", (int)tmnow.tv_usec / 1000); // ms
         strcat(time_buf, usec_buf);

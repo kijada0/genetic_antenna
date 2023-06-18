@@ -127,7 +127,7 @@ double random_lognormal_double_in_range(double min, double max) {
     return dist(gen);
 }
 
-double random_chi_squared_double_in_range(double min, double max) {
+double random_chi_square_double_in_range(double min, double max) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::chi_squared_distribution<double> dist(10);
@@ -145,7 +145,6 @@ double random_chi_squared_double_in_range(double min, double max) {
     return dist(gen);
 }
 
-
 void random_int_pair_without_repetition(int *a, int *b, int min, int max){
     pr_debug("Random int pair without repetition...");
     *a = random_int_in_range(min, max);
@@ -159,11 +158,11 @@ void random_int_pair_without_repetition(int *a, int *b, int min, int max){
 void random_int_pair_without_repetition_nonlinear_distribution(int *a, int *b, int min, int max){
     pr_debug("Random int pair without repetition non linear distribution...");
     int a0 = (int)random_half_normal_double_in_range(min, max);
-    int b0 = (int)random_chi_squared_double_in_range(min, max);
+    int b0 = (int)random_chi_square_double_in_range(min, max);
     pr_debug("a0: %d, b0: %d", a0, b0);
 
     while(a0 == b0){
-        b0 = (int)random_chi_squared_double_in_range(min, max);
+        b0 = (int)random_chi_square_double_in_range(min, max);
     }
 
     *a = a0;

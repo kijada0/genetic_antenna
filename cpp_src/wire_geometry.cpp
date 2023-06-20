@@ -234,8 +234,8 @@ void generate_random_ground_plane(antenna_geometry_t *geometry){
     double segments_angles_xy = 2 * M_PI / GROUND_PLANE_ELEMENT_COUNT;
     double segments_angles_xz = random_angle_in_radina();
 
-    // segments_lengths = wavelength * 0.28 * 0.9;
-    // segments_angles_xz = (2*M_PI/8)*7;
+//     segments_lengths = wavelength * 0.28 * 0.9;
+//     segments_angles_xz = (2*M_PI/8)*7;
 
     for(int i = 0; i < GROUND_PLANE_ELEMENT_COUNT; i++){
         geometry->ground_plane[i].length = segments_lengths;
@@ -252,7 +252,7 @@ antenna_geometry_t generate_random_antenna(){
     antenna_geometry_t random_antenna{};
 
     init_antenna_geometry(&random_antenna);
-    //generate_test_dipol(&random_antenna);
+    // generate_test_dipol(&random_antenna);
     generate_random_antenna_wires(&random_antenna);
     generate_random_ground_plane(&random_antenna);
     calculate_wire_geometry(&random_antenna);

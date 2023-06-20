@@ -5,6 +5,7 @@
 
 #include <cstring>
 #include <string>
+#include <filesystem>
 
 #include "print.h"
 
@@ -130,10 +131,14 @@ void create_next_generation(antenna_t *population, antenna_t *parents, int *rank
 void save_sorted_population_to_file(antenna_t *population, int *ranking, int population_size){
     pr_debug("Saving population to file...");
     create_folder_if_not_exist(string(OUTPUT_FILE_DIRECTORY));
+
     string file_name = string(OUTPUT_FILE_DIRECTORY) + "population_" + get_current_time() + ".csv";
     FILE *file = fopen(file_name.c_str(), "w");
 
-    if(file == nullptr){
+    string file_name_last = string(OUTPUT_FILE_DIRECTORY) + "population_last.csv";
+    FILE *file_last = fopen(file_name_last.c_str(), "w");
+
+    if(file == nullptr || file_last == nullptr){
         printf("Error opening file!\n");
         pr_error("Error opening file!");
         exit(1);
@@ -167,9 +172,12 @@ void save_sorted_population_to_file(antenna_t *population, int *ranking, int pop
         }
 
         fprintf(file, "%s\n", line.c_str());
+        fprintf(file_last, "%s\n", line.c_str());
     }
 
     fclose(file);
+    fclose(file_last);
+
     pr_info("Population saved to file... %s", file_name.c_str());
 }
 
@@ -207,6 +215,94 @@ void save_telemetry(antenna_t *population, int *ranking, int population_size, in
     fclose(file);
 
     pr_info("Saving telemetry... %s", file_path.c_str());
+}
+
+// -------------------------------------------------------------------------------- //
+
+string getLatestFileName(const std::string& folder_path) {
+    string latestFileName;
+    filesystem::file_time_type latestTime;
+
+    for (const auto& entry : filesystem::directory_iterator(folder_path)) {
+        if (entry.is_regular_file()) {
+            const auto& fileTime = filesystem::last_write_time(entry);
+            if (fileTime > latestTime) {
+                latestTime = fileTime;
+                latestFileName = entry.path().filename().string();
+            }
+        }
+    }
+
+    return latestFileName;
+}
+
+int load_population_from_file(antenna_t *population, int population_size){
+    pr_debug("Loading population from file...");
+    string population_dir = string(OUTPUT_FILE_DIRECTORY);
+    if(!filesystem::is_directory(population_dir)){
+        printf("Population directory does not exist!\n");
+        pr_error("Population directory does not exist!");
+        return -1;
+    }
+
+    string file_name = population_dir + "population_last.csv";
+    FILE *file = fopen(file_name.c_str(), "r");
+
+    if(file == nullptr){
+        printf("Error opening file!\n");
+        pr_error("Error opening file!");
+        return -1;
+    }
+
+    char line[5+3*WIRE_COUNT+3*GROUND_PLANE_ELEMENT_COUNT*16];
+    string line_tab[5+3*WIRE_COUNT+3*GROUND_PLANE_ELEMENT_COUNT];
+    int individual_count = 0;
+
+    while(fgets(line, sizeof(line), file) != nullptr){
+        if (individual_count >= 0){
+            individual_count++;
+            continue;
+        }
+        individual_count++;
+
+        int i = 0;
+        char *token = strtok(line, ";");
+        while(token != nullptr){
+            line_tab[i] = string(token);
+            token = strtok(nullptr, ";");
+            i++;
+        }
+
+        int index = stoi(line_tab[0]);
+        int ranking = stoi(line_tab[1]);
+        double fitness = stod(line_tab[2]);
+
+        population[ranking].fitness = fitness;
+
+        int active_element_count = stoi(line_tab[3]);
+        for(int j = 0; j < active_element_count; j++){
+            population[ranking].geometry.active_elements[j].length = stod(line_tab[4+j*3]);
+            population[ranking].geometry.active_elements[j].angle_xy = stod(line_tab[5+j*3]);
+            population[ranking].geometry.active_elements[j].angle_xz = stod(line_tab[6+j*3]);
+        }
+
+        int ground_plane_element_count = stoi(line_tab[4+3*WIRE_COUNT]);
+        for(int j = 0; j < ground_plane_element_count; j++){
+            population[ranking].geometry.ground_plane[j].length = stod(line_tab[5+3*WIRE_COUNT+j*3]);
+            population[ranking].geometry.ground_plane[j].angle_xy = stod(line_tab[6+3*WIRE_COUNT+j*3]);
+            population[ranking].geometry.ground_plane[j].angle_xz = stod(line_tab[7+3*WIRE_COUNT+j*3]);
+        }
+
+        calculate_wire_geometry(&population[ranking].geometry);
+        clear_antenna_geometry(&population[ranking].geometry);
+    }
+
+    fclose(file);
+
+    pr_info("Population loaded from file... %s", file_name.c_str());
+    printf("Population loaded from file... %s\n", file_name.c_str());
+
+    return 0;
 }
 
 // -------------------------------------------------------------------------------- //

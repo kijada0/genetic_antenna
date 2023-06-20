@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 source_file = "population_230617_053924392.csv"
-source_file = "D:\Studia\CDV\Semetr2\Sztuczna Inteligencja\projekt_zaliczeniowy\genetic_antenna\cpp_src\out\population_230618_221042087.csv"
+source_file = "D:\Studia\CDV\Semetr2\Sztuczna Inteligencja\projekt_zaliczeniowy\genetic_antenna\python_src\population_230619_183223200.csv"
 
 
 antenna_count = 1
@@ -23,7 +23,26 @@ def main():
     for antenna in geometry:
         new_geo = convert_geometry(antenna)
         show_geometry(new_geo, count)
+        convert_to_4nec2_format(new_geo)
+        convert_to_maa_format(new_geo)
         count += 1
+
+
+def convert_to_4nec2_format(geometry):
+    print("\n" + "-"*40)
+    for wire, num in zip(geometry, range(len(geometry))):
+        # line = "GW {} {} {} {} {} {} {} {} {}".format(num, 4, wire[0], wire[1], wire[2], wire[3], wire[4], wire[5], 0.003)
+        line = "GW {} {} {} {} {} {} {} {} {}".format(num, 4, round(wire[0], 3), round(wire[1], 3), round(wire[2], 3), round(wire[3], 3), round(wire[4], 3), round(wire[5], 3), 0.003)
+        print(line)
+
+
+def convert_to_maa_format(geometry):
+    print("\n" + "-"*40)
+    print(len(geometry))
+    for wire, num in zip(geometry, range(len(geometry))):
+        # line = "{}, {}, {}, {}, {}, {}, {}, {}".format(wire[0], wire[1], wire[2], wire[3], wire[4], wire[5], 0.003, 8)
+        line = "{}, {}, {}, {}, {}, {}, {}, {}".format(round(wire[0], 3), round(wire[1], 3), round(wire[2], 3), round(wire[3], 3), round(wire[4], 3), round(wire[5], 3), 0.003, 8)
+        print(line)
 
 
 def read_file(file_name):

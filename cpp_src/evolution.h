@@ -19,6 +19,6 @@ void create_generation_zero(antenna_t *population, int population_size);
 void create_next_generation(antenna_t *population, antenna_t *parents, int *ranking, int population_size, int parent_count);
 
 void save_sorted_population_to_file(antenna_t *population, int *ranking, int population_size);
-void load_population_from_file(antenna_t *population, int population_size);
+int load_population_from_file(antenna_t *population, int population_size);
 
 void save_telemetry(antenna_t *population, int *ranking, int population_size, int generation_number, int range, double generation_duration);

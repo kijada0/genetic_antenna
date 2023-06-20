@@ -256,7 +256,7 @@ int calculate_antenna_fitness(antenna_parameters_t *parameters){
     pr_junk("Gain: %d \nRHCP %d \nLHCP %d \n", gain_fitness, gain_RHCP_fitness, gain_LHCP_fitness);
 
     // SWR
-    int VSWR_fitness = VSWR_WEIGHT - (abs(1 - parameters->SWR.VSWR) * VSWR_WEIGHT);
+    int VSWR_fitness = VSWR_WEIGHT - (fabs(1 - parameters->SWR.VSWR) * VSWR_WEIGHT);
     pr_junk("VSWR: %d\n", VSWR_fitness);
     int S11_fitness = -1 * parameters->SWR.S11 * S11_WEIGHT;
     pr_junk("S11: %d\n", S11_fitness);

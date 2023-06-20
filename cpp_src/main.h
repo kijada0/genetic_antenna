@@ -8,7 +8,7 @@
 
 // ---------------------------------------- //
 // Antenna parameters //
-#define WIRE_COUNT 4
+#define WIRE_COUNT 8
 #define GROUND_PLANE_ELEMENT_COUNT 4
 #define TOTAL_WIRE_COUNT (WIRE_COUNT+GROUND_PLANE_ELEMENT_COUNT)
 
@@ -23,8 +23,8 @@
 // ---------------------------------------- //
 // Population parameters //
 #define POPULATION_SIZE 256
-#define PARENT_COUNT 192
-#define MUTATION_RATE 0.25
+#define PARENT_COUNT 128
+#define MUTATION_RATE 0.10
 
 // ---------------------------------------- //
 // System parameters //
@@ -40,10 +40,13 @@
     #define TELEMETRY_FILE_DIRECTORY "/home/kijada/genetic/telemetry/"
 #endif
 
+
+#define LOAD_POPULATION_FROM_FILE false
+
 // ---------------------------------------- //
 
-#define SAVE_POPULATION_PERIOD 5
-#define TELEMETRY_RANGE 10
+#define SAVE_POPULATION_PERIOD 10
+#define TELEMETRY_RANGE 16
 
 // ---------------------------------------- //
 

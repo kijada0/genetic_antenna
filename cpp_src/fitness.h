@@ -15,14 +15,14 @@
 #define MES_STEP_COUNT (int)(MES_BANDWIDTH/MES_FREQ_STEP)
 #define MES_GAIN_STEP_COUNT 24      // 24 steps of gain
 
-#define MAX_SWR 1.5
+#define MAX_SWR 1.0
 
 #define GAIN_WEIGHT 200
-#define GAIN_RHCP_WEIGHT 50
+#define GAIN_RHCP_WEIGHT 100
 #define GAIN_LHCP_WEIGHT 25
-#define VSWR_WEIGHT 200
-#define S11_WEIGHT 1
-#define BANDWIDTH_WEIGHT 10
+#define VSWR_WEIGHT 800
+#define S11_WEIGHT 4
+#define BANDWIDTH_WEIGHT 50
 
 #include "main.h"
 #include "wire_geometry.h"

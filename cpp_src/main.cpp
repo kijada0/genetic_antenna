@@ -97,9 +97,26 @@ int main() {
     pr_always("Starting evolution...");
     pr_always("------------------------------------------------------------");
 
-    create_generation_zero(&population[0], POPULATION_SIZE);
+    if(LOAD_POPULATION_FROM_FILE == false){
+        pr_info("Generation generated randomly.");
+        printf("Generation generated randomly.\n");
+        create_generation_zero(&population[0], POPULATION_SIZE);
+    }
+    else{
+        if(load_population_from_file(&population[0], POPULATION_SIZE) != 0){
+            pr_error("Failed to load population from file.");
+            printf("Failed to load population from file.\n");
+            create_generation_zero(&population[0], POPULATION_SIZE);
+            pr_info("Generation generated randomly.");
+            printf("Generation generated randomly.\n");
+        }
+        else{
+            pr_info("Generation loaded from file.");
+            printf("Generation loaded from file.\n");
+        }
+    }
 
-    while(get_duration_in_s(start) < (24*60*60) && cycle_count < 10000){
+    while(get_duration_in_s(start) < (24*60*60) && cycle_count < 25000){
         auto time0 = high_resolution_clock::now();
         distributes_computations_across_threads(&population[0]);
         sort_antennas_by_fitness(&population[0], &ranking[0], POPULATION_SIZE);
